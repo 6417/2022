@@ -1,0 +1,3 @@
+[submodule "src/lib/FridoWPI"]
+	path = src/lib/FridoWPI
+	url = https://github.com/6417/FridoWPI.git
