@@ -79,8 +79,13 @@ wpi.sim.addDriverstation()
 // in order to make them all available at runtime. Also adding the manifest so WPILib
 // knows where to look for our Robot Class.
 
-jar {
+compileJava {
     dependsOn gradle.includedBuild("FridoWPI").task(":jar")
+    compileJava
+}
+
+jar {
+//    dependsOn gradle.includedBuild("FridoWPI").task(":jar")
 
 
     from {
