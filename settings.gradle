@@ -25,3 +25,14 @@ pluginManagement {
         }
     }
 }
+
+
+//include "FridoWPI"
+
+// tag::composite_substitution[]
+includeBuild("src/lib/FridoWPI") {
+    dependencySubstitution {
+        substitute module("ch.firdolins:fridowpi") using project(":")
+    }
+}
+// end::composite_substitution[]
