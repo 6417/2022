@@ -47,6 +47,16 @@ wpi.java.debugJni = false
 // Set this to true to enable desktop support.
 def includeDesktopSupport = false
 
+repositories {
+    mavenCentral()
+    maven {
+        url "https://maven.revrobotics.com/"
+    }
+    maven {
+        url "https://maven.ctr-electronics.com/release/"
+    }
+}
+
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 4.
 dependencies {
@@ -69,6 +79,15 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
     implementation files('src/lib/FridoWPI/build/libs/FridoWPI.jar')
+
+    // Navx
+    implementation group: 'com.kauailabs.navx.frc', name: 'navx-java', version: '4.0.442'
+
+    // CTRE Talons
+    implementation group: 'com.ctre.phoenix', name: 'api-java', version: '5.19.4'
+
+    // REV Sparks
+    implementation group: 'com.revrobotics.frc', name: 'REVLib-java', version: '2022.1.1'
 }
 
 // Simulation configuration (e.g. environment variables).
