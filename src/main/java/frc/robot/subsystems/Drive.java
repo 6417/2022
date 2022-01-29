@@ -2,7 +2,9 @@ package frc.robot.subsystems;
 
 import ch.fridolins.fridowpi.Initializer;
 import ch.fridolins.fridowpi.base.Initialisable;
-import ch.fridolins.fridowpi.base.motors.FridolinsMotor;
+import ch.fridolins.fridowpi.joystick.Binding;
+import ch.fridolins.fridowpi.joystick.joysticks.Logitech;
+import ch.fridolins.fridowpi.motors.FridolinsMotor;
 import ch.fridolins.fridowpi.command.Command;
 import ch.fridolins.fridowpi.joystick.IJoystickButtonId;
 import ch.fridolins.fridowpi.joystick.IJoystickId;
@@ -27,15 +29,22 @@ import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstrai
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.Joysticks;
+import frc.robot.commands.DriveCommand;
+import frc.robot.commands.SpeedCommand;
 import frc.robot.subsystems.base.DriveBase;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Drive extends DriveBase {
 
     private static final boolean enabled = true;
     private static DriveBase instance = null;
 
-    private static final class Constants {
+    public static final class Constants {
         public static final class Speeds {
             public static final double slow = 0.375;
             public static final double normal = 1;
@@ -97,10 +106,10 @@ public class Drive extends DriveBase {
             left.factoryDefault();
             leftFollower.factoryDefault();
 
-            right.setIdleMode(FridolinsMotor.IdleModeType.kBrake);
-            rightFollower.setIdleMode(FridolinsMotor.IdleModeType.kBrake);
-            left.setIdleMode(FridolinsMotor.IdleModeType.kBrake);
-            leftFollower.setIdleMode(FridolinsMotor.IdleModeType.kBrake);
+            right.setIdleMode(FridolinsMotor.IdleMode.kBrake);
+            rightFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
+            left.setIdleMode(FridolinsMotor.IdleMode.kBrake);
+            leftFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
 
             rightFollower.follow(right, FridolinsMotor.DirectionType.invertMaster);
             leftFollower.follow(left, FridolinsMotor.DirectionType.invertMaster);
@@ -180,9 +189,9 @@ public class Drive extends DriveBase {
     public void resetSensors() {
         Navx.getInstance().reset();
         odometry.resetPosition(new Pose2d(0, 0, new Rotation2d(0)), new Rotation2d(0));
-        // TODO: use FridolinsMotor interface
-        // motors.right.resetEncoder();
-        // motors.left.resetEncoder();
+
+        motors.right.setEncoderPosition(0.0);
+        motors.left.setEncoderPosition(0.0);
     }
 
     public DifferentialDriveKinematics getDriveKinematics() {
@@ -214,22 +223,16 @@ public class Drive extends DriveBase {
     }
 
     private double getLeftWheelDistance() {
-        // TODO: user FridolinsMotor encoders
-//        return encoderL.getPosition() / Constants.Drive.encoderToMetersConversion;
-        return 0;
+        return motors.left.getEncoderTicks() / Constants.encoderToMetersConversion;
     }
 
     private double getRightWheelDistance() {
-        // TODO: user FridolinsMotor encoders
-//        return encoderR.getPosition() / -Constants.Drive.encoderToMetersConversion;
-        return 0;
+        return motors.right.getEncoderTicks() / Constants.encoderToMetersConversion;
     }
 
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-        // TODO: user FridolinsMotor encoders
-//        return new DifferentialDriveWheelSpeeds(encoderL.getVelocity() / (60 * Constants.Drive.encoderToMetersConversion),
-//                -encoderR.getVelocity() / (60 * Constants.Drive.encoderToMetersConversion));
-        return new DifferentialDriveWheelSpeeds(0, 0);
+        return new DifferentialDriveWheelSpeeds(motors.left.getEncoderVelocity() / (60 * Constants.encoderToMetersConversion),
+                -motors.right.getEncoderVelocity() / (60 * Constants.encoderToMetersConversion));
     }
 
     public Pose2d getPosition() {
@@ -311,6 +314,13 @@ public class Drive extends DriveBase {
     @Override
     public void periodic() {
         updateOdometry();
+    }
+
+    @Override
+    public List<Binding> getMappings() {
+        return List.of(
+                new Binding(Constants.ButtonBindings.joystick, Constants.ButtonBindings.slowButton, Button::toggleWhenPressed, new SpeedCommand())
+        );
     }
 
     @Override
