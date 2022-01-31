@@ -83,6 +83,13 @@ public class Drive extends DriveBase {
             public static final IJoystickId joystick = Joysticks.Drive;
             public static final IJoystickButtonId slowButton = LogitechExtreme._8;
         }
+
+        public static class Autonomous {
+            public static final double recordingCooldownSeconds = 0.1;
+            public static final double velocityThresholdStart = 0.01;
+            public static final double velocityThresholdEnd = 0.02;
+            public static final double positionCorrection = 0.9875;
+        }
     }
 
     private class Motors implements Initialisable {

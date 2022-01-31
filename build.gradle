@@ -88,6 +88,9 @@ dependencies {
 
     // REV Sparks
     implementation group: 'com.revrobotics.frc', name: 'REVLib-java', version: '2022.1.1'
+
+    // Gson
+    implementation 'com.google.code.gson:gson:2.8.9'
 }
 
 // Simulation configuration (e.g. environment variables).
