@@ -1,20 +1,18 @@
 package frc.robot.subsystems.base;
 
-import ch.fridolins.fridowpi.joystick.JoystickHandler;
 import ch.fridolins.fridowpi.module.Module;
-import ch.fridolins.fridowpi.sensors.Navx;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
-import frc.robot.Joysticks;
 import frc.robot.subsystems.Drive;
 
 public class DriveBase extends Module {
@@ -67,6 +65,10 @@ public class DriveBase extends Module {
 
     public SimpleMotorFeedforward getMotorFeedforward() {
         return new SimpleMotorFeedforward(0.0, 0.0);
+    }
+
+    public ChassisSpeeds getChassisSpeeds() {
+        return new ChassisSpeeds();
     }
 
     public void resetOdometry(Pose2d setPoint) {

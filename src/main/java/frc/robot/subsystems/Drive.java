@@ -1,24 +1,25 @@
 package frc.robot.subsystems;
 
+import java.util.List;
+
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import ch.fridolins.fridowpi.Initializer;
 import ch.fridolins.fridowpi.base.Initialisable;
 import ch.fridolins.fridowpi.joystick.Binding;
-import ch.fridolins.fridowpi.joystick.joysticks.Logitech;
-import ch.fridolins.fridowpi.motors.FridolinsMotor;
-import ch.fridolins.fridowpi.command.Command;
 import ch.fridolins.fridowpi.joystick.IJoystickButtonId;
 import ch.fridolins.fridowpi.joystick.IJoystickId;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
-import ch.fridolins.fridowpi.joystick.joysticks.LogitechExtreme;
+import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
+import ch.fridolins.fridowpi.motors.FridolinsMotor;
+import ch.fridolins.fridowpi.motors.FridolinsMotor.FridoFeedBackDevice;
 import ch.fridolins.fridowpi.sensors.Navx;
-import com.ctre.phoenix.motorcontrol.FollowerType;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
@@ -27,17 +28,13 @@ import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstrain
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.Joysticks;
+import frc.robot.autonomous.RecordTrajectoryCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SpeedCommand;
 import frc.robot.subsystems.base.DriveBase;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Drive extends DriveBase {
 
@@ -81,7 +78,8 @@ public class Drive extends DriveBase {
 
         public static final class ButtonBindings {
             public static final IJoystickId joystick = Joysticks.Drive;
-            public static final IJoystickButtonId slowButton = LogitechExtreme._8;
+            public static final IJoystickButtonId slowButton = () -> 8;
+            public static final IJoystickButtonId recordButton = () -> 2;
         }
 
         public static class Autonomous {
@@ -93,7 +91,7 @@ public class Drive extends DriveBase {
     }
 
     private class Motors implements Initialisable {
-        private boolean initialized = false;
+        private boolean initialized = true;
 
         public FridolinsMotor right;
         private FridolinsMotor rightFollower;
@@ -106,20 +104,31 @@ public class Drive extends DriveBase {
 
         @Override
         public void init() {
-            initialized = true;
+            right = new FridoCanSparkMax(Constants.Motors.IDs.rightMaster, MotorType.kBrushless);
+            rightFollower = new FridoCanSparkMax(Constants.Motors.IDs.rightFollower, MotorType.kBrushless);
+            left = new FridoCanSparkMax(Constants.Motors.IDs.leftMaster, MotorType.kBrushless);
+            leftFollower = new FridoCanSparkMax(Constants.Motors.IDs.leftFollower, MotorType.kBrushless);
 
             right.factoryDefault();
             rightFollower.factoryDefault();
             left.factoryDefault();
             leftFollower.factoryDefault();
 
+            right.setInverted(true);
+            left.setInverted(true);
+
             right.setIdleMode(FridolinsMotor.IdleMode.kBrake);
             rightFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
             left.setIdleMode(FridolinsMotor.IdleMode.kBrake);
             leftFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
 
-            rightFollower.follow(right, FridolinsMotor.DirectionType.invertMaster);
-            leftFollower.follow(left, FridolinsMotor.DirectionType.invertMaster);
+            rightFollower.follow(right, FridolinsMotor.DirectionType.followMaster);
+            leftFollower.follow(left, FridolinsMotor.DirectionType.followMaster);
+
+            right.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            rightFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            left.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            leftFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
 
             Drive.this.registerSubmodule(right);
             Drive.this.registerSubmodule(rightFollower);
@@ -137,6 +146,8 @@ public class Drive extends DriveBase {
 
     private Drive() {
         Initializer.getInstance().addInitialisable(this);
+        ;
+        JoystickHandler.getInstance().bind(this);
     }
 
     public static DriveBase getInstance() {
@@ -168,15 +179,18 @@ public class Drive extends DriveBase {
     @Override
     public void init() {
         super.init();
-        setDefaultCommand(new Command());
+        motors.init();
+        setDefaultCommand(new DriveCommand());
 
-        odometry = new DifferentialDriveOdometry(new Rotation2d(0), new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
+        odometry = new DifferentialDriveOdometry(new Rotation2d(0),
+                new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
         kinematics = new DifferentialDriveKinematics(Constants.trackWidthMeters);
 
         configMotors();
         tankDrive = new DifferentialDrive(motors.left, motors.right);
 
-        odometry = new DifferentialDriveOdometry(new Rotation2d(0), new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
+        odometry = new DifferentialDriveOdometry(new Rotation2d(0),
+                new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
         kinematics = new DifferentialDriveKinematics(Constants.trackWidthMeters);
 
         resetSensors();
@@ -189,8 +203,10 @@ public class Drive extends DriveBase {
 
         configTrajectoryConfig();
 
-        rightVelocityController = new PIDController(Constants.PathWeaver.kP, Constants.PathWeaver.kI, Constants.PathWeaver.kD);
-        leftVelocityController = new PIDController(Constants.PathWeaver.kP, Constants.PathWeaver.kI, Constants.PathWeaver.kD);
+        rightVelocityController = new PIDController(Constants.PathWeaver.kP, Constants.PathWeaver.kI,
+                Constants.PathWeaver.kD);
+        leftVelocityController = new PIDController(Constants.PathWeaver.kP, Constants.PathWeaver.kI,
+                Constants.PathWeaver.kD);
     }
 
     public void resetSensors() {
@@ -234,11 +250,12 @@ public class Drive extends DriveBase {
     }
 
     private double getRightWheelDistance() {
-        return motors.right.getEncoderTicks() / Constants.encoderToMetersConversion;
+        return -motors.right.getEncoderTicks() / Constants.encoderToMetersConversion;
     }
 
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-        return new DifferentialDriveWheelSpeeds(motors.left.getEncoderVelocity() / (60 * Constants.encoderToMetersConversion),
+        return new DifferentialDriveWheelSpeeds(
+                motors.left.getEncoderVelocity() / (60 * Constants.encoderToMetersConversion),
                 -motors.right.getEncoderVelocity() / (60 * Constants.encoderToMetersConversion));
     }
 
@@ -250,8 +267,11 @@ public class Drive extends DriveBase {
         return motorFeedforward;
     }
 
-    private void configMotors() {
+    public ChassisSpeeds getChassisSpeeds() {
+        return kinematics.toChassisSpeeds(getWheelSpeeds());
+    }
 
+    private void configMotors() {
     }
 
     private void configSimpleMotorFeedforward() {
@@ -288,7 +308,8 @@ public class Drive extends DriveBase {
     private void configTrajectoryConfig() {
         trajectoryConfig = new TrajectoryConfig(
                 Constants.PathWeaver.kMaxSpeed,
-                Constants.PathWeaver.kMaxAcceleration).setKinematics(kinematics).addConstraint(voltageConstraint).addConstraint(kinematicsConstraint).addConstraint(centripetalAccelerationConstraint);
+                Constants.PathWeaver.kMaxAcceleration).setKinematics(kinematics).addConstraint(voltageConstraint)
+                        .addConstraint(kinematicsConstraint).addConstraint(centripetalAccelerationConstraint);
     }
 
     public void resetOdometry(Pose2d setPoint) {
@@ -297,11 +318,13 @@ public class Drive extends DriveBase {
     }
 
     private void updateOdometry() {
-        odometry.update(Rotation2d.fromDegrees(Navx.getInstance().getAngle()), getLeftWheelDistance(), getRightWheelDistance());
+        odometry.update(Rotation2d.fromDegrees(-Navx.getInstance().getAngle()), getLeftWheelDistance(),
+                getRightWheelDistance());
     }
 
     public void drive() {
-        tankDrive.arcadeDrive(-JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getX() * this.speed, JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getY() * this.speed);
+        tankDrive.arcadeDrive(-JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getX() * this.speed,
+                JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getY() * this.speed);
     }
 
     public void setSpeed(double maxSpeed) {
@@ -326,8 +349,10 @@ public class Drive extends DriveBase {
     @Override
     public List<Binding> getMappings() {
         return List.of(
-                new Binding(Constants.ButtonBindings.joystick, Constants.ButtonBindings.slowButton, Button::toggleWhenPressed, new SpeedCommand())
-        );
+                new Binding(Constants.ButtonBindings.joystick, Constants.ButtonBindings.slowButton,
+                        Button::toggleWhenPressed, new SpeedCommand()),
+                new Binding(Constants.ButtonBindings.joystick, Constants.ButtonBindings.recordButton, Button::whileHeld,
+                        new RecordTrajectoryCommand()));
     }
 
     @Override

@@ -1,45 +1,42 @@
 package frc.robot;
 
+import java.util.List;
+
 import ch.fridolins.fridowpi.Initializer;
+import ch.fridolins.fridowpi.joystick.JoystickHandler;
 import ch.fridolins.fridowpi.sensors.Navx;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.autonomous.PathviewerLoader;
+import frc.robot.autonomous.RamseteCommandGenerator;
 import frc.robot.subsystems.Drive;
 
 public class Robot extends TimedRobot {
+    private Command m_autonomousCommand;
+
     static {
-        Navx.getInstance();
-        Drive.getInstance();
     }
 
-    /**
-     * This function is run when the robot is first started up and should be used for any
-     * initialization code.
-     */
     @Override
     public void robotInit() {
+        JoystickHandler.getInstance().setupJoysticks(List.of(Joysticks.Drive));
+        Navx.setup(SPI.Port.kMXP);
+        // Navx.setYawOffset(-180);
+        Navx.getInstance();
+        Drive.getInstance();
+        Navx.getInstance().resetDisplacement();
+        Navx.getInstance().reset();
+        
         Initializer.getInstance().init();
     }
 
-    /**
-     * This function is called every robot packet, no matter the mode. Use this for items like
-     * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
-     *
-     * <p>This runs after the mode specific periodic functions, but before LiveWindow and
-     * SmartDashboard integrated updating.
-     */
     @Override
     public void robotPeriodic() {
-        // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-        // commands, running already-scheduled commands, removing finished or interrupted commands,
-        // and running subsystem periodic() methods.  This must be called from the robot's periodic
-        // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
     }
 
-    /**
-     * This function is called once each time the robot enters Disabled mode.
-     */
     @Override
     public void disabledInit() {
     }
@@ -51,22 +48,31 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         Navx.getInstance().reset();
+
+        String trajectoryJSON = "paths/output/TrajectoryRecording.wpilib.json";
+
+        Trajectory pathWeavertest = PathviewerLoader.loadTrajectory(trajectoryJSON);
+
+        m_autonomousCommand = RamseteCommandGenerator.generateRamseteCommand(pathWeavertest);
+
+        if (m_autonomousCommand != null) {
+            m_autonomousCommand.schedule();
+        }
     }
 
-    /**
-     * This function is called periodically during autonomous.
-     */
     @Override
     public void autonomousPeriodic() {
     }
 
     @Override
     public void teleopInit() {
+        Navx.getInstance().reset();
+        
+        if (m_autonomousCommand != null) {
+            m_autonomousCommand.cancel();
+        }
     }
 
-    /**
-     * This function is called periodically during operator control.
-     */
     @Override
     public void teleopPeriodic() {
     }
@@ -75,9 +81,6 @@ public class Robot extends TimedRobot {
     public void testInit() {
     }
 
-    /**
-     * This function is called periodically during test mode.
-     */
     @Override
     public void testPeriodic() {
     }
