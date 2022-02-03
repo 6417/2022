@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import ch.fridolins.fridowpi.Initializer;
-import ch.fridolins.fridowpi.base.Initialisable;
+import ch.fridolins.fridowpi.initializer.Initializer;
+import ch.fridolins.fridowpi.initializer.Initialisable;
 import ch.fridolins.fridowpi.joystick.Binding;
 import ch.fridolins.fridowpi.joystick.IJoystickButtonId;
 import ch.fridolins.fridowpi.joystick.IJoystickId;
@@ -145,9 +145,12 @@ public class Drive extends DriveBase {
     private Motors motors = new Motors();
 
     private Drive() {
-        Initializer.getInstance().addInitialisable(this);
-        ;
+        Initializer.getInstance().after(Navx.getInstance(), motors)
+                .then(this)
+                .then(JoystickHandler.getInstance());
+
         JoystickHandler.getInstance().bind(this);
+
     }
 
     public static DriveBase getInstance() {
@@ -179,7 +182,6 @@ public class Drive extends DriveBase {
     @Override
     public void init() {
         super.init();
-        motors.init();
         setDefaultCommand(new DriveCommand());
 
         odometry = new DifferentialDriveOdometry(new Rotation2d(0),
@@ -309,7 +311,7 @@ public class Drive extends DriveBase {
         trajectoryConfig = new TrajectoryConfig(
                 Constants.PathWeaver.kMaxSpeed,
                 Constants.PathWeaver.kMaxAcceleration).setKinematics(kinematics).addConstraint(voltageConstraint)
-                        .addConstraint(kinematicsConstraint).addConstraint(centripetalAccelerationConstraint);
+                .addConstraint(kinematicsConstraint).addConstraint(centripetalAccelerationConstraint);
     }
 
     public void resetOdometry(Pose2d setPoint) {

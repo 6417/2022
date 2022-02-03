@@ -2,12 +2,13 @@ package frc.robot;
 
 import java.util.List;
 
-import ch.fridolins.fridowpi.Initializer;
+import ch.fridolins.fridowpi.initializer.Initializer;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
 import ch.fridolins.fridowpi.sensors.Navx;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.autonomous.PathviewerLoader;
 import frc.robot.autonomous.RamseteCommandGenerator;
@@ -28,7 +29,7 @@ public class Robot extends TimedRobot {
         Drive.getInstance();
         Navx.getInstance().resetDisplacement();
         Navx.getInstance().reset();
-        
+
         Initializer.getInstance().init();
     }
 
@@ -67,7 +68,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         Navx.getInstance().reset();
-        
+
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
