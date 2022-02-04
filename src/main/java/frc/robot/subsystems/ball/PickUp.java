@@ -2,8 +2,8 @@ package frc.robot.subsystems.ball;
 
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import ch.fridolins.fridowpi.Initializer;
-import ch.fridolins.fridowpi.base.Initialisable;
+import ch.fridolins.fridowpi.initializer.Initialisable;
+import ch.fridolins.fridowpi.initializer.Initializer;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
 import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
 import ch.fridolins.fridowpi.motors.FridolinsMotor;
