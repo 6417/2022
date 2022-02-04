@@ -162,4 +162,10 @@ public class TelescopeArm extends TelescopeArmBase {
         builder.addDoubleProperty("encoder pos", motors::getEncoderTicks, null);
         builder.addBooleanProperty("bottom limit switch", this::getBottomLimitSwitch, null);
     }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.addDoubleProperty("EncoderPosition", () -> motor.getEncoderTicks(), null);
+        super.initSendable(builder);
+    }
 }
