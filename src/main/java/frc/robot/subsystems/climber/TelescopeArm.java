@@ -9,6 +9,7 @@ import ch.fridolins.fridowpi.motors.FridolinsMotor.DirectionType;
 import ch.fridolins.fridowpi.motors.FridolinsMotor.FridoFeedBackDevice;
 import ch.fridolins.fridowpi.motors.FridolinsMotor.IdleMode;
 import ch.fridolins.fridowpi.motors.FridolinsMotor.LimitSwitchPolarity;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 public class TelescopeArm extends Module {
     public static final class Constants {
@@ -79,5 +80,11 @@ public class TelescopeArm extends Module {
 
     public boolean isPidFinished() {
         return (Math.abs(position - motor.getEncoderTicks()) <= Constants.threshold);
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.addDoubleProperty("EncoderPosition", () -> motor.getEncoderTicks(), null);
+        super.initSendable(builder);
     }
 }
