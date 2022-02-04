@@ -58,6 +58,8 @@ public class Thrower extends ThrowerBase {
         usRight = new UltrasonicSensor(Constants.UltraSonicSensors.pingRight, Constants.UltraSonicSensors.echoRight);
 
         usSensorArray = new UltrasonicSensorArray(usRight, usLeft, Constants.UltraSonicSensors.sensorSeparation);
+
+        registerSubmodule(motor);
     }
 
     @Override
