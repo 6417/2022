@@ -2,15 +2,13 @@ package frc.robot.subsystems.ball;
 
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import ch.fridolins.fridowpi.Initializer;
-import ch.fridolins.fridowpi.base.Initialisable;
+import ch.fridolins.fridowpi.initializer.*;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
 import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
 import ch.fridolins.fridowpi.motors.FridolinsMotor;
 import ch.fridolins.fridowpi.motors.FridolinsMotor.FridoFeedBackDevice;
 import ch.fridolins.fridowpi.motors.FridolinsMotor.IdleMode;
 import ch.fridolins.fridowpi.motors.FridolinsMotor.LimitSwitchPolarity;
-import ch.fridolins.fridowpi.motors.utils.PidValues;
 import frc.robot.subsystems.ball.base.PickUpBase;
 
 public class PickUp extends PickUpBase {
@@ -23,11 +21,10 @@ public class PickUp extends PickUpBase {
         public static final class Expander {
             public static final int id = 0;
 
-            public static final PidValues pidValues = new PidValues(0, 0, 0);
-
             public static final double angle = 0;
 
-            public static final LimitSwitchPolarity first = LimitSwitchPolarity.kDisabled;
+            public static final LimitSwitchPolarity forward = LimitSwitchPolarity.kDisabled;
+            public static final LimitSwitchPolarity reverse = LimitSwitchPolarity.kDisabled;
         }
     }
 
@@ -54,6 +51,9 @@ public class PickUp extends PickUpBase {
 
             brush.configEncoder(FridoFeedBackDevice.kBuildin, 42);
             expander.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+
+            expander.enableReverseLimitSwitch(Constants.Expander.reverse, true);
+            expander.enableForwardLimitSwitch(Constants.Expander.forward, true);
 
             PickUp.this.registerSubmodule(brush);
             PickUp.this.registerSubmodule(expander);
@@ -88,8 +88,6 @@ public class PickUp extends PickUpBase {
     public void init() {
         super.init();
         motors.init();
-
-        motors.expander.setPID(Constants.Expander.pidValues);
     }
 
     @Override
@@ -109,18 +107,17 @@ public class PickUp extends PickUpBase {
 
     @Override
     public void openExpander() { 
-        // TODO: find out the Formula with finished roboter
-        motors.expander.setPosition(Constants.Expander.angle);
+        motors.expander.isReverseLimitSwitchActive();
     }
 
     @Override
     public void closeExpander() {
-        motors.expander.setPosition(0);
+        motors.expander.isForwardLimitSwitchActive();
     }
 
-    private void resetExpander() {
+    @Override
+    public void resetExpander() {
         motors.expander.isForwardLimitSwitchActive(); //TODO: Look if Forward or Reversed
 
-        motors.expander.enableForwardLimitSwitch(Constants.Expander.first, true);
     }
 }

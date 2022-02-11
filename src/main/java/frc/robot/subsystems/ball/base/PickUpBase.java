@@ -20,4 +20,7 @@ public class PickUpBase extends Module {
 
     public void closeExpander() {
     }
+
+    public void resetExpander() {
+    }
 }
