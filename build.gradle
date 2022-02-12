@@ -80,6 +80,7 @@ wpi.sim.addDriverstation()
 // knows where to look for our Robot Class.
 
 compileJava {
+    dependsOn gradle.includedBuild("FridoWPI").task(":compileJava")
     dependsOn gradle.includedBuild("FridoWPI").task(":jar")
     compileJava
 }
