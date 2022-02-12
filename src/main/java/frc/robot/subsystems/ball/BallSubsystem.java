@@ -1,7 +1,14 @@
 package frc.robot.subsystems.ball;
 
+<<<<<<< HEAD
 import ch.fridolins.fridowpi.command.ICommand;
 import ch.fridolins.fridowpi.initializer.Initializer;
+=======
+import ch.fridolins.fridowpi.command.Command;
+import ch.fridolins.fridowpi.command.ICommand;
+import ch.fridolins.fridowpi.initializer.Initializer;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+>>>>>>> Ballsubsystem
 import frc.robot.commands.PickupCommand;
 import frc.robot.commands.RetractGripperCommand;
 import frc.robot.commands.ReverseflowCommand;
