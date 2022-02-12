@@ -14,8 +14,8 @@ import frc.robot.subsystems.ball.base.PickUpBase;
 public class PickUp extends PickUpBase {
     public static final class Constants {
         public static final class Brush {
-            public static final int id = 0;
-            public static final double speed = 1;
+            public static final int id = 2;
+            public static final double speed = 0.1; // or 0.2 to test
         }
 
         public static final class Expander {
@@ -46,7 +46,7 @@ public class PickUp extends PickUpBase {
             brush.factoryDefault();
             expander.factoryDefault();
 
-            brush.setIdleMode(IdleMode.kBrake);
+            brush.setIdleMode(IdleMode.kCoast);
             expander.setIdleMode(IdleMode.kBrake);
 
             brush.configEncoder(FridoFeedBackDevice.kBuildin, 42);
@@ -107,17 +107,16 @@ public class PickUp extends PickUpBase {
 
     @Override
     public void openExpander() { 
-        motors.expander.isReverseLimitSwitchActive();
+        motors.expander.isReverseLimitSwitchActive(); //TODO: Look if Forward or Reversed
     }
 
     @Override
     public void closeExpander() {
-        motors.expander.isForwardLimitSwitchActive();
+        motors.expander.isForwardLimitSwitchActive(); //TODO: Look if Forward or Reversed
     }
 
     @Override
     public void resetExpander() {
         motors.expander.isForwardLimitSwitchActive(); //TODO: Look if Forward or Reversed
-
     }
 }
