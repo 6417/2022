@@ -5,6 +5,7 @@ import ch.fridolins.fridowpi.motors.LimitSwitch;
 import ch.fridolins.fridowpi.pneumatics.FridoSolenoid;
 import ch.fridolins.fridowpi.pneumatics.ISolenoid;
 import ch.fridolins.fridowpi.pneumatics.PneumaticHandler;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class TilterHook extends Module {
@@ -73,5 +74,17 @@ public class TilterHook extends Module {
 
     public boolean isLockable() {
         return right.lockableSwitch.get() && left.lockableSwitch.get();
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
+        builder.addBooleanProperty("right pipe in hook switch", right.pipeInHookSwitch::get, null);
+        builder.addBooleanProperty("left pipe in hook switch", left.pipeInHookSwitch::get, null);
+
+        builder.addBooleanProperty("right is lockable switch", right.pipeInHookSwitch::get, null);
+        builder.addBooleanProperty("left is lockable switch", left.pipeInHookSwitch::get, null);
+
+        builder.addBooleanProperty("solenoid state", solenoid::get, null);
     }
 }

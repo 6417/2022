@@ -3,14 +3,15 @@ package frc.robot.subsystems.climber;
 import ch.fridolins.fridowpi.initializer.Initializer;
 import ch.fridolins.fridowpi.joystick.Binding;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
-import ch.fridolins.fridowpi.joystick.joysticks.LogitechExtreme;
 import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
 import ch.fridolins.fridowpi.motors.FridolinsMotor;
 
 import java.util.List;
+import java.util.Optional;
 
+import ch.fridolins.fridowpi.motors.utils.PidValues;
 import com.revrobotics.CANSparkMaxLowLevel;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.Joysticks;
@@ -29,6 +30,12 @@ public class Tilter extends TilterBase {
 
         // TODO: use corresponding limit switches
         public static final TilterHook.Params hookParams = new TilterHook.Params(0, true, null, null);
+
+        public static final PidValues pid = new PidValues(0.0, 0.0, 0.0);
+
+        static {
+            pid.setTolerance(0.0);
+        }
     }
 
     private FridolinsMotor motor;
@@ -46,6 +53,10 @@ public class Tilter extends TilterBase {
         super.init();
 
         motor = new FridoCanSparkMax(Constants.motorId, CANSparkMaxLowLevel.MotorType.kBrushed);
+
+        motor.configEncoder(FridolinsMotor.FridoFeedBackDevice.kBuildin, 1);
+        motor.setPID(Constants.pid);
+
         motor.enableForwardLimitSwitch(Constants.forwardLimitSwitchPolarity, true);
         motor.enableReverseLimitSwitch(Constants.reverseLimitSwitchPolarity, true);
     }
@@ -82,11 +93,31 @@ public class Tilter extends TilterBase {
         this.hook.openHook();
     }
 
+    private Optional<Double> targetPos;
+
+    @Override
+    public void setPosition(double ticks) {
+        motor.setPosition(ticks);
+        targetPos = Optional.of(ticks);
+    }
+
+    @Override
+    public boolean isAtTargetPos() {
+        return motor.pidAtTarget();
+    }
+
     @Override
     public List<Binding> getMappings() {
         return List.of(
                 new Binding(Joysticks.Drive, () -> 5, Button::whenPressed, new InstantCommand(this::openHooks)),
                 new Binding(Joysticks.Drive, () -> 3, Button::whenPressed, new InstantCommand(this::closeHooks))
         );
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
+        builder.addDoubleProperty("target pos", () -> targetPos.orElse(0.0), null);
+        builder.addDoubleProperty("motor pos", motor::getEncoderTicks, null);
     }
 }
