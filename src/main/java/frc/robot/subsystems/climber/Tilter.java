@@ -27,7 +27,8 @@ public class Tilter extends TilterBase {
 
         public static final double zeroingSpeed = 0.0;
 
-        public static final TilterHook.Params hookParams = new TilterHook.Params(0, true);
+        // TODO: use corresponding limit switches
+        public static final TilterHook.Params hookParams = new TilterHook.Params(0, true, null, null);
     }
 
     private FridolinsMotor motor;
@@ -44,9 +45,9 @@ public class Tilter extends TilterBase {
     public void init() {
         super.init();
 
-        // motor = new FridoCanSparkMax(Constants.motorId, CANSparkMaxLowLevel.MotorType.kBrushed);
-        // motor.enableForwardLimitSwitch(Constants.forwardLimitSwitchPolarity, true);
-        // motor.enableReverseLimitSwitch(Constants.reverseLimitSwitchPolarity, true);
+        motor = new FridoCanSparkMax(Constants.motorId, CANSparkMaxLowLevel.MotorType.kBrushed);
+        motor.enableForwardLimitSwitch(Constants.forwardLimitSwitchPolarity, true);
+        motor.enableReverseLimitSwitch(Constants.reverseLimitSwitchPolarity, true);
     }
 
     public void gotoZeroPoint() {
@@ -56,6 +57,7 @@ public class Tilter extends TilterBase {
     public boolean frontLimitSwitch() {
         return motor.isForwardLimitSwitchActive();
     }
+
     public boolean backLimitSwitch() {
         return motor.isReverseLimitSwitchActive();
     }
@@ -83,8 +85,8 @@ public class Tilter extends TilterBase {
     @Override
     public List<Binding> getMappings() {
         return List.of(
-            new Binding(Joysticks.Drive, () -> 5, Button::whenPressed, new InstantCommand(this::openHooks)),
-            new Binding(Joysticks.Drive, () -> 3, Button::whenPressed, new InstantCommand(this::closeHooks))
+                new Binding(Joysticks.Drive, () -> 5, Button::whenPressed, new InstantCommand(this::openHooks)),
+                new Binding(Joysticks.Drive, () -> 3, Button::whenPressed, new InstantCommand(this::closeHooks))
         );
     }
 }
