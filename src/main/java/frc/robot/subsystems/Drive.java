@@ -69,10 +69,12 @@ public class Drive extends DriveBase {
 
         public static final class Motors {
             public static final class IDs {
-                public static final int leftMaster = 10;
-                public static final int leftFollower = 11;
+                public static final int leftMaster = 11;
+                public static final int leftBackFollower = 15;
+                public static final int leftFrontFollower = 13;
                 public static final int rightMaster = 12;
-                public static final int rightFollower = 13;
+                public static final int rightBackFollower = 14;
+                public static final int rightFrontFollower = 10;
             }
         }
 
@@ -94,9 +96,11 @@ public class Drive extends DriveBase {
         private boolean initialized = true;
 
         public FridolinsMotor right;
-        private FridolinsMotor rightFollower;
+        private FridolinsMotor rightFrontFollower;
         public FridolinsMotor left;
-        private FridolinsMotor leftFollower;
+        private FridolinsMotor leftBackFollower;
+        private FridoCanSparkMax rightBackFollower;
+        private FridoCanSparkMax leftFrontFollower;
 
         public Motors() {
             Initializer.getInstance().addInitialisable(this);
@@ -105,35 +109,48 @@ public class Drive extends DriveBase {
         @Override
         public void init() {
             right = new FridoCanSparkMax(Constants.Motors.IDs.rightMaster, MotorType.kBrushless);
-            rightFollower = new FridoCanSparkMax(Constants.Motors.IDs.rightFollower, MotorType.kBrushless);
+            rightFrontFollower = new FridoCanSparkMax(Constants.Motors.IDs.rightFrontFollower, MotorType.kBrushless);
+            rightBackFollower = new FridoCanSparkMax(Constants.Motors.IDs.rightBackFollower, MotorType.kBrushless);
+
             left = new FridoCanSparkMax(Constants.Motors.IDs.leftMaster, MotorType.kBrushless);
-            leftFollower = new FridoCanSparkMax(Constants.Motors.IDs.leftFollower, MotorType.kBrushless);
+            leftFrontFollower = new FridoCanSparkMax(Constants.Motors.IDs.leftFrontFollower, MotorType.kBrushless);
+            leftBackFollower = new FridoCanSparkMax(Constants.Motors.IDs.leftBackFollower, MotorType.kBrushless);
 
             right.factoryDefault();
-            rightFollower.factoryDefault();
+            rightFrontFollower.factoryDefault();
+            rightFrontFollower.factoryDefault();
             left.factoryDefault();
-            leftFollower.factoryDefault();
+            leftBackFollower.factoryDefault();
+            leftFrontFollower.factoryDefault();
 
-            right.setInverted(true);
-            left.setInverted(true);
+//            right.setInverted(true);
+//            left.setInverted(true);
 
             right.setIdleMode(FridolinsMotor.IdleMode.kBrake);
-            rightFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
+            rightFrontFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
+            rightBackFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
             left.setIdleMode(FridolinsMotor.IdleMode.kBrake);
-            leftFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
+            leftBackFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
+            leftFrontFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
 
-            rightFollower.follow(right, FridolinsMotor.DirectionType.followMaster);
-            leftFollower.follow(left, FridolinsMotor.DirectionType.followMaster);
+            rightFrontFollower.follow(right, FridolinsMotor.DirectionType.followMaster);
+            rightBackFollower.follow(right, FridolinsMotor.DirectionType.followMaster);
+            leftBackFollower.follow(left, FridolinsMotor.DirectionType.followMaster);
+            leftFrontFollower.follow(left, FridolinsMotor.DirectionType.followMaster);
 
             right.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            rightFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            rightFrontFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            rightBackFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
             left.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            leftFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            leftBackFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            leftFrontFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
 
             Drive.this.registerSubmodule(right);
-            Drive.this.registerSubmodule(rightFollower);
+            Drive.this.registerSubmodule(rightFrontFollower);
+            Drive.this.registerSubmodule(rightBackFollower);
             Drive.this.registerSubmodule(left);
-            Drive.this.registerSubmodule(leftFollower);
+            Drive.this.registerSubmodule(leftBackFollower);
+            Drive.this.registerSubmodule(leftFrontFollower);
         }
 
         @Override
