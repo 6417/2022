@@ -61,14 +61,17 @@ public class Tilter extends TilterBase {
         motor.enableReverseLimitSwitch(Constants.reverseLimitSwitchPolarity, true);
     }
 
+    @Override
     public void gotoZeroPoint() {
         motor.set(Constants.zeroingSpeed);
     }
 
+    @Override
     public boolean frontLimitSwitch() {
         return motor.isForwardLimitSwitchActive();
     }
 
+    @Override
     public boolean backLimitSwitch() {
         return motor.isReverseLimitSwitchActive();
     }
@@ -99,6 +102,11 @@ public class Tilter extends TilterBase {
     public void setPosition(double ticks) {
         motor.setPosition(ticks);
         targetPos = Optional.of(ticks);
+    }
+
+    @Override
+    public void stopMotor() {
+        motor.stopMotor();
     }
 
     @Override
