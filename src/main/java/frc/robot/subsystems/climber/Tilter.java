@@ -110,6 +110,11 @@ public class Tilter extends TilterBase {
     }
 
     @Override
+    public void resetEncoder() {
+        motor.setEncoderPosition(0);
+    }
+
+    @Override
     public boolean isAtTargetPos() {
         return motor.pidAtTarget();
     }

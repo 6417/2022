@@ -31,4 +31,7 @@ public class TilterBase extends Module {
     public void stopMotor() {
 
     }
+
+    public void resetEncoder() {
+    }
 }

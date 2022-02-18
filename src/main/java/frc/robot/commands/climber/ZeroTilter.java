@@ -16,6 +16,7 @@ public class ZeroTilter extends Command {
     @Override
     public void end(boolean interrupted) {
         Tilter.getInstance().stopMotor();
+        Tilter.getInstance().resetEncoder();
     }
 
     @Override
