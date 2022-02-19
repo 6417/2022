@@ -21,8 +21,6 @@ public class PickUp extends PickUpBase {
         public static final class Expander {
             public static final int id = 0;
 
-            public static final double angle = 0;
-
             public static final LimitSwitchPolarity forward = LimitSwitchPolarity.kDisabled;
             public static final LimitSwitchPolarity reverse = LimitSwitchPolarity.kDisabled;
         }
