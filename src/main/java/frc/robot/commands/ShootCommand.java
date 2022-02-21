@@ -15,8 +15,9 @@ public class ShootCommand extends SequentialCommandGroup {
     @Override
     public void initialize() {
         super.initialize();
-        addCommands(new InstantCommand(() -> BallSubsystem.getInstance().setShooterToVelocity()), new TimerCommand(0.5),
-                new InstantCommand(() -> transportSubmodule.run()));
+        addCommands(new InstantCommand(() -> BallSubsystem.getInstance().setShooterToVelocity()),
+                    new TimerCommand(0.5),
+                    new InstantCommand(() -> transportSubmodule.run()));
         addRequirements(BallSubsystem.getInstance());
     }
 }

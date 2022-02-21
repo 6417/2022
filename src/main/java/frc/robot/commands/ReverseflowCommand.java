@@ -24,6 +24,7 @@ public class ReverseflowCommand extends Command{
     @Override
     public void execute() {
         super.execute();
+        pickupModule.openExpander();
         transportModule.reverse();
         pickupModule.reverseBrush();
     }

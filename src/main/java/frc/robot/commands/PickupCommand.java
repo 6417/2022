@@ -36,5 +36,6 @@ public class PickupCommand extends Command{
     @Override
     public void end(boolean interrupted) {
         pickUpModule.stopBrush();
+        transportModule.stop();
     }
 }
