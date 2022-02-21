@@ -52,8 +52,8 @@ public class TelescopeArm extends TelescopeArmBase {
         public void init() {
             initialized = true;
             rightFollower = new FridoCanSparkMax(Constants.Ids.rightFollower, MotorType.kBrushless);
-            left = new FridoCanSparkMax(Constants.Ids.rightFollower, MotorType.kBrushless);
-            leftFollower = new FridoCanSparkMax(Constants.Ids.rightFollower, MotorType.kBrushless);
+            left = new FridoCanSparkMax(Constants.Ids.left, MotorType.kBrushless);
+            leftFollower = new FridoCanSparkMax(Constants.Ids.leftFollower, MotorType.kBrushless);
 
             rightFollower.follow(this);
             left.follow(this);
