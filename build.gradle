@@ -84,7 +84,7 @@ dependencies {
     implementation group: 'com.kauailabs.navx.frc', name: 'navx-java', version: '4.0.442'
 
     // CTRE Talons
-    implementation group: 'com.ctre.phoenix', name: 'api-java', version: '5.19.4'
+    // implementation group: 'com.ctre.phoenix', name: 'api-java', version: '5.19.4'
 
     // REV Sparks
     implementation group: 'com.revrobotics.frc', name: 'REVLib-java', version: '2022.1.1'

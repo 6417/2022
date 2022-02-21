@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.List;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import ch.fridolins.fridowpi.initializer.Initializer;
@@ -11,6 +12,7 @@ import ch.fridolins.fridowpi.joystick.IJoystickButtonId;
 import ch.fridolins.fridowpi.joystick.IJoystickId;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
 import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
+import ch.fridolins.fridowpi.motors.FridoFalcon500;
 import ch.fridolins.fridowpi.motors.FridolinsMotor;
 import ch.fridolins.fridowpi.motors.FridolinsMotor.FridoFeedBackDevice;
 import ch.fridolins.fridowpi.sensors.Navx;
@@ -99,23 +101,22 @@ public class Drive extends DriveBase {
         private FridolinsMotor rightFrontFollower;
         public FridolinsMotor left;
         private FridolinsMotor leftBackFollower;
-        private FridoCanSparkMax rightBackFollower;
-        private FridoCanSparkMax leftFrontFollower;
+        private FridolinsMotor rightBackFollower;
+        private FridolinsMotor leftFrontFollower;
 
         public Motors() {
-            Initializer.getInstance().addInitialisable(this);
+            // Initializer.getInstance().addInitialisable(this);
+            right = new FridoFalcon500(Constants.Motors.IDs.rightMaster);
+            rightFrontFollower = new FridoFalcon500(Constants.Motors.IDs.rightFrontFollower);
+            rightBackFollower = new FridoFalcon500(Constants.Motors.IDs.rightBackFollower);
+
+            left = new FridoFalcon500(Constants.Motors.IDs.leftMaster);
+            leftFrontFollower = new FridoFalcon500(Constants.Motors.IDs.leftFrontFollower);
+            leftBackFollower = new FridoFalcon500(Constants.Motors.IDs.leftBackFollower);
         }
 
         @Override
         public void init() {
-            right = new FridoCanSparkMax(Constants.Motors.IDs.rightMaster, MotorType.kBrushless);
-            rightFrontFollower = new FridoCanSparkMax(Constants.Motors.IDs.rightFrontFollower, MotorType.kBrushless);
-            rightBackFollower = new FridoCanSparkMax(Constants.Motors.IDs.rightBackFollower, MotorType.kBrushless);
-
-            left = new FridoCanSparkMax(Constants.Motors.IDs.leftMaster, MotorType.kBrushless);
-            leftFrontFollower = new FridoCanSparkMax(Constants.Motors.IDs.leftFrontFollower, MotorType.kBrushless);
-            leftBackFollower = new FridoCanSparkMax(Constants.Motors.IDs.leftBackFollower, MotorType.kBrushless);
-
             right.factoryDefault();
             rightFrontFollower.factoryDefault();
             rightFrontFollower.factoryDefault();
@@ -123,8 +124,8 @@ public class Drive extends DriveBase {
             leftBackFollower.factoryDefault();
             leftFrontFollower.factoryDefault();
 
-//            right.setInverted(true);
-//            left.setInverted(true);
+            // right.setInverted(true);
+            // left.setInverted(true);
 
             right.setIdleMode(FridolinsMotor.IdleMode.kBrake);
             rightFrontFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
@@ -138,19 +139,23 @@ public class Drive extends DriveBase {
             leftBackFollower.follow(left, FridolinsMotor.DirectionType.followMaster);
             leftFrontFollower.follow(left, FridolinsMotor.DirectionType.followMaster);
 
-            right.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            rightFrontFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            rightBackFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            left.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            leftBackFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            leftFrontFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            // TODO: Maybe not necessary with falcon500 motors
 
-            Drive.this.registerSubmodule(right);
-            Drive.this.registerSubmodule(rightFrontFollower);
-            Drive.this.registerSubmodule(rightBackFollower);
-            Drive.this.registerSubmodule(left);
-            Drive.this.registerSubmodule(leftBackFollower);
-            Drive.this.registerSubmodule(leftFrontFollower);
+            // right.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            // rightFrontFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            // rightBackFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            // left.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            // leftBackFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            // leftFrontFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+
+            // Drive.this.registerSubmodule(right);
+            // Drive.this.registerSubmodule(rightFrontFollower);
+            // Drive.this.registerSubmodule(rightBackFollower);
+            // Drive.this.registerSubmodule(left);
+            // Drive.this.registerSubmodule(leftBackFollower);
+            // Drive.this.registerSubmodule(leftFrontFollower);
+
+            System.out.println("Motors init completed");
         }
 
         @Override
@@ -162,12 +167,13 @@ public class Drive extends DriveBase {
     private Motors motors = new Motors();
 
     private Drive() {
-        Initializer.getInstance().after(Navx.getInstance(), motors)
-                .then(this)
-                .then(JoystickHandler.getInstance());
-
+        // Initializer.getInstance().after(Navx.getInstance(), motors)
+        //         .then(this)
+        //         .then(JoystickHandler.getInstance()).close();
+        // ;
+        // Initializer.getInstance().removeInitialisable(motors);
+        // requires(motors);
         JoystickHandler.getInstance().bind(this);
-
     }
 
     public static DriveBase getInstance() {
@@ -199,6 +205,7 @@ public class Drive extends DriveBase {
     @Override
     public void init() {
         super.init();
+        motors.init();
         setDefaultCommand(new DriveCommand());
 
         odometry = new DifferentialDriveOdometry(new Rotation2d(0),
@@ -226,6 +233,8 @@ public class Drive extends DriveBase {
                 Constants.PathWeaver.kD);
         leftVelocityController = new PIDController(Constants.PathWeaver.kP, Constants.PathWeaver.kI,
                 Constants.PathWeaver.kD);
+
+        System.out.println("Drive init completed");
     }
 
     public void resetSensors() {
@@ -328,7 +337,7 @@ public class Drive extends DriveBase {
         trajectoryConfig = new TrajectoryConfig(
                 Constants.PathWeaver.kMaxSpeed,
                 Constants.PathWeaver.kMaxAcceleration).setKinematics(kinematics).addConstraint(voltageConstraint)
-                .addConstraint(kinematicsConstraint).addConstraint(centripetalAccelerationConstraint);
+                        .addConstraint(kinematicsConstraint).addConstraint(centripetalAccelerationConstraint);
     }
 
     public void resetOdometry(Pose2d setPoint) {

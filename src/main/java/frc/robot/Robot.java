@@ -31,6 +31,8 @@ public class Robot extends TimedRobot {
         Navx.getInstance().reset();
 
         Initializer.getInstance().init();
+
+        System.out.println("Initializer init");
     }
 
     @Override
