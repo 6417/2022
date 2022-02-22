@@ -12,6 +12,10 @@ public class TelescopeArmBase extends Module {
     }
     
     public void gotoTraversalWrung() {
+        
+    }
+
+    public void gotoHandover() {
 
     }
 

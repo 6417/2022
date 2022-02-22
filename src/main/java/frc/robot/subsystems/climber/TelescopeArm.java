@@ -32,6 +32,7 @@ public class TelescopeArm extends TelescopeArmBase {
             public static final double checkFirst = 0;
             public static final double traversalHeight = 0;
             public static final double extended = 0;
+            public static final double handover = 0;
         }
 
         public static final class MayExceeded {
@@ -159,6 +160,11 @@ public class TelescopeArm extends TelescopeArmBase {
     @Override
     public void gotoTraversalWrung() {
         gotoPos(Constants.Heights.traversalHeight);
+    }
+
+    @Override
+    public void gotoHandover() {
+        gotoPos(Constants.Heights.handover);
     }
 
     @Override
