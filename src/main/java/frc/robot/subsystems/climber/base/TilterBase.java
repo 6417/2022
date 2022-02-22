@@ -6,6 +6,10 @@ public class TilterBase extends Module {
     public void gotoZeroPoint() {
     }
 
+    public void gotoTraversalPoint() {
+
+    }
+
     public boolean frontLimitSwitch() {
         return false;
     }
