@@ -6,6 +6,10 @@ public class TelescopeArmBase extends Module {
     public void gotoFirstWrung() {
 
     }
+    
+    public void gotoTraversalWrung() {
+
+    }
 
     public void extend() {
 

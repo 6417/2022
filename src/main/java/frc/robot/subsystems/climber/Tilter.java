@@ -3,6 +3,7 @@ package frc.robot.subsystems.climber;
 import ch.fridolins.fridowpi.initializer.Initializer;
 import ch.fridolins.fridowpi.joystick.Binding;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
+import ch.fridolins.fridowpi.joystick.joysticks.Logitech;
 import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
 import ch.fridolins.fridowpi.motors.FridolinsMotor;
 
@@ -10,8 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 import ch.fridolins.fridowpi.motors.utils.PidValues;
+import ch.fridolins.fridowpi.sensors.Navx;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.drive.Vector2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.Joysticks;
@@ -32,6 +36,7 @@ public class Tilter extends TilterBase {
         public static final TilterHook.Params hookParams = new TilterHook.Params(0, true, null, null);
 
         public static final PidValues pid = new PidValues(0.0, 0.0, 0.0);
+        public static final double kF = 1.0;
 
         static {
             pid.setTolerance(0.0);
@@ -40,12 +45,24 @@ public class Tilter extends TilterBase {
 
     private FridolinsMotor motor;
     private TilterHook hook;
+    private Thread updateKF;
+    private Vector2d pointOfMass = new Vector2d(0.0, 0.0);
 
     private Tilter() {
         hook = new TilterHook(Constants.hookParams);
         requires(hook);
         Initializer.getInstance().addInitialisable(this);
         JoystickHandler.getInstance().bind(this);
+    }
+
+    private double calcFeedForward() {
+        return Constants.kF * (Math.cos(Navx.getInstance().getPitch()) * pointOfMass.x - Math.sin(Navx.getInstance().getPitch())) / Math.cos(Navx.getInstance().getPitch());
+    }
+
+    private void updateFeedForward() {
+        PidValues pid = Constants.pid;
+        pid.kF = Optional.of(calcFeedForward());
+        motor.setPID(Constants.pid);
     }
 
     @Override
@@ -59,6 +76,19 @@ public class Tilter extends TilterBase {
 
         motor.enableForwardLimitSwitch(Constants.forwardLimitSwitchPolarity, true);
         motor.enableReverseLimitSwitch(Constants.reverseLimitSwitchPolarity, true);
+
+        updateKF = new Thread(() -> {
+            while (true) {
+                updateFeedForward();
+                try {
+                    wait(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        });
+        updateKF.start();
     }
 
     @Override
@@ -117,6 +147,11 @@ public class Tilter extends TilterBase {
     @Override
     public boolean isAtTargetPos() {
         return motor.pidAtTarget();
+    }
+
+    @Override
+    public void setVelocity(double vel) {
+        motor.set(vel);
     }
 
     @Override

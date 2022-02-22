@@ -25,6 +25,7 @@ public class TelescopeArm extends TelescopeArmBase {
 
         public static final class Heights {
             public static final double firstWrung = 0;
+            public static final double traversalHeight = 0;
             public static final double extended = 0;
         }
 
@@ -117,6 +118,11 @@ public class TelescopeArm extends TelescopeArmBase {
     @Override
     public void gotoFirstWrung() {
         gotoPos(Constants.Heights.firstWrung);
+    }
+
+    @Override
+    public void gotoTraversalWrung() {
+        gotoPos(Constants.Heights.traversalHeight);
     }
 
     @Override
