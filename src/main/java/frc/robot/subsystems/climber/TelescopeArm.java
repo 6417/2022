@@ -68,6 +68,9 @@ public class TelescopeArm extends TelescopeArmBase {
 
             right.enableForwardLimitSwitch(Constants.limitSwitchPolarity, true);
             left.enableForwardLimitSwitch(Constants.limitSwitchPolarity, true);
+
+            right.enableReverseLimitSwitch(Constants.limitSwitchPolarity, false);
+            left.enableReverseLimitSwitch(Constants.limitSwitchPolarity, false);
         }
 
         @Override
@@ -79,6 +82,9 @@ public class TelescopeArm extends TelescopeArmBase {
     Motors motors = new Motors();
     LimitSwitch bottomLimitSwitchRight;
     LimitSwitch bottomLimitSwitchLeft;
+
+    LimitSwitch wrungContactSwitchRight;
+    LimitSwitch wrungContactSwitchLeft;
 
     private TelescopeArm() {
         requires(motors);
@@ -167,6 +173,11 @@ public class TelescopeArm extends TelescopeArmBase {
     }
 
     @Override
+    public boolean hasWrungContact() {
+        return wrungContactSwitchLeft.get() && wrungContactSwitchRight.get();
+    }
+
+    @Override
     public void retract() {
         gotoPos(0.0);
     }
@@ -188,6 +199,9 @@ public class TelescopeArm extends TelescopeArmBase {
         // TODO: Find out which limit switch is used
         bottomLimitSwitchRight = null;
         bottomLimitSwitchLeft = null;
+
+        wrungContactSwitchRight = null;
+        wrungContactSwitchLeft = null;
     }
 
     @Override
