@@ -1,9 +1,13 @@
 package frc.robot.subsystems.climber;
 
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import ch.fridolins.fridowpi.initializer.Initialisable;
 import ch.fridolins.fridowpi.initializer.Initializer;
 import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
 import ch.fridolins.fridowpi.motors.FridolinsMotor;
 import ch.fridolins.fridowpi.motors.LimitSwitch;
+import ch.fridolins.fridowpi.pneumatics.FridoSolenoid;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.climber.base.TelescopeArmBase;
@@ -36,32 +40,33 @@ public class TelescopeArm extends TelescopeArmBase {
         }
     }
 
-    private static class Motors extends FridoCanSparkMax {
+    private static class Motors implements Initialisable{
         private boolean initialized = false;
-
         private FridoCanSparkMax rightFollower;
         private FridoCanSparkMax leftFollower;
-        private FridoCanSparkMax left;
-
+        public FridoCanSparkMax left;
+        public FridoCanSparkMax right;
 
         public Motors() {
-            super(Constants.Ids.right, MotorType.kBrushless);
             Initializer.getInstance().addInitialisable(this);
         }
 
         @Override
         public void init() {
             initialized = true;
+            right = new FridoCanSparkMax(Constants.Ids.right, MotorType.kBrushless);
             rightFollower = new FridoCanSparkMax(Constants.Ids.rightFollower, MotorType.kBrushless);
             left = new FridoCanSparkMax(Constants.Ids.left, MotorType.kBrushless);
             leftFollower = new FridoCanSparkMax(Constants.Ids.leftFollower, MotorType.kBrushless);
 
-            rightFollower.follow(this);
-            left.follow(this);
-            leftFollower.follow(this);
+            rightFollower.follow(right);
+            leftFollower.follow(left);
 
-            configEncoder(FridoFeedBackDevice.kBuildin, 1);
-            enableForwardLimitSwitch(Constants.limitSwitchPolarity, true);
+            left.configEncoder(ch.fridolins.fridowpi.motors.FridolinsMotor.FridoFeedBackDevice.kBuildin, 1);
+            right.configEncoder(ch.fridolins.fridowpi.motors.FridolinsMotor.FridoFeedBackDevice.kBuildin, 1);
+
+            right.enableForwardLimitSwitch(Constants.limitSwitchPolarity, true);
+            left.enableForwardLimitSwitch(Constants.limitSwitchPolarity, true);
         }
 
         @Override
@@ -71,7 +76,8 @@ public class TelescopeArm extends TelescopeArmBase {
     }
 
     Motors motors = new Motors();
-    LimitSwitch bottomLimitSwitch;
+    LimitSwitch bottomLimitSwitchRight;
+    LimitSwitch bottomLimitSwitchLeft;
 
     private TelescopeArm() {
         requires(motors);
@@ -94,25 +100,43 @@ public class TelescopeArm extends TelescopeArmBase {
     }
 
     private void maxExceededCheck() {
-        if (motors.getEncoderTicks() == Constants.MayExceeded.limit) {
-            DriverStation.reportError("Max height of telescope arm reached", false);
-            gotoSoftMax();
-        } else if (motors.getEncoderTicks() > Constants.MayExceeded.limit) {
-            DriverStation.reportError("Max height of telescope arm exceeded", false);
-            gotoSoftMax();
+        if (motors.right.getEncoderTicks() >= Constants.MayExceeded.limit) {
+            DriverStation.reportError("Max height of right telescope arm reached", false);
+            gotoRightSoftMax();
+        } else if (motors.right.getEncoderTicks() > Constants.MayExceeded.limit) {
+            DriverStation.reportError("Max height of right telescope arm exceeded", false);
+            gotoRightSoftMax();
         }
+
+        if (motors.left.getEncoderTicks() >= Constants.MayExceeded.limit) {
+            DriverStation.reportError("Max height of left telescope arm reached", false);
+            gotoLeftSoftMax();
+        } else if (motors.left.getEncoderTicks() > Constants.MayExceeded.limit) {
+            DriverStation.reportError("Max height of left telescope arm exceeded", false);
+            gotoLeftSoftMax();
+        }
+
     }
 
-    private void gotoSoftMax() {
-        motors.stopMotor();
-        motors.set(Constants.MayExceeded.speed);
+    private void gotoRightSoftMax() {
+        motors.right.stopMotor();
+        motors.right.set(Constants.MayExceeded.speed);
         //noinspection StatementWithEmptyBody
-        while (motors.getEncoderTicks() >= Constants.MayExceeded.softMax) ;
-        motors.stopMotor();
+        while (motors.right.getEncoderTicks() >= Constants.MayExceeded.softMax) ;
+        motors.right.stopMotor();
+    }
+
+    private void gotoLeftSoftMax() {
+        motors.left.stopMotor();
+        motors.left.set(Constants.MayExceeded.speed);
+        //noinspection StatementWithEmptyBody
+        while (motors.left.getEncoderTicks() >= Constants.MayExceeded.softMax) ;
+        motors.left.stopMotor();
     }
 
     private void gotoPos(double pos) {
-        motors.setPosition(pos);
+        motors.right.setPosition(pos);
+        motors.left.setPosition(pos);
     }
 
     @Override
@@ -127,12 +151,13 @@ public class TelescopeArm extends TelescopeArmBase {
 
     @Override
     public void resetEncoders() {
-        motors.setEncoderPosition(0);
+        motors.right.setEncoderPosition(0);
+        motors.left.setEncoderPosition(0);
     }
 
     @Override
     public boolean getBottomLimitSwitch() {
-        return bottomLimitSwitch.get();
+        return bottomLimitSwitchRight.get() && bottomLimitSwitchLeft.get();
     }
 
     @Override
@@ -142,7 +167,8 @@ public class TelescopeArm extends TelescopeArmBase {
 
     @Override
     public void startZero() {
-        motors.set(Constants.zeroSpeed);
+        motors.left.set(Constants.zeroSpeed);
+        motors.right.set(Constants.zeroSpeed);
     }
 
     @Override
@@ -154,18 +180,19 @@ public class TelescopeArm extends TelescopeArmBase {
     public void init() {
         super.init();
         // TODO: Find out which limit switch is used
-        bottomLimitSwitch = null;
+        bottomLimitSwitchRight = null;
+        bottomLimitSwitchLeft = null;
     }
 
     @Override
     public boolean isAtTarget() {
-        return motors.pidAtTarget();
+        return motors.left.pidAtTarget() && motors.right.pidAtTarget();
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
-        builder.addDoubleProperty("encoder pos", motors::getEncoderTicks, null);
+        builder.addDoubleProperty("encoder pos", motors.right::getEncoderTicks, null);
         builder.addBooleanProperty("bottom limit switch", this::getBottomLimitSwitch, null);
     }
 }
