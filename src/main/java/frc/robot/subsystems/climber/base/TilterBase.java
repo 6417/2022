@@ -32,6 +32,10 @@ public class TilterBase extends Module {
         return true;
     }
 
+    public boolean hasWrungContact() {
+        return false;
+    }
+
     public void stopMotor() {
 
     }
