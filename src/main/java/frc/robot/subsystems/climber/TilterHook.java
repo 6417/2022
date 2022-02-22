@@ -75,7 +75,7 @@ public class TilterHook extends Module {
         state = Hookstate.unlocked;
     }
 
-    public boolean isPipeInHook() {
+    public boolean isWrungInHook() {
         return right.pipeInHookSwitch.get() && left.pipeInHookSwitch.get();
     }
 
