@@ -34,4 +34,7 @@ public class TilterBase extends Module {
 
     public void resetEncoder() {
     }
+
+    public void setVelocity(double vel) {
+    }
 }

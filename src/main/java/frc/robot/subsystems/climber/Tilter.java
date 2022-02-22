@@ -3,6 +3,7 @@ package frc.robot.subsystems.climber;
 import ch.fridolins.fridowpi.initializer.Initializer;
 import ch.fridolins.fridowpi.joystick.Binding;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
+import ch.fridolins.fridowpi.joystick.joysticks.Logitech;
 import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
 import ch.fridolins.fridowpi.motors.FridolinsMotor;
 
@@ -76,7 +77,7 @@ public class Tilter extends TilterBase {
         motor.enableForwardLimitSwitch(Constants.forwardLimitSwitchPolarity, true);
         motor.enableReverseLimitSwitch(Constants.reverseLimitSwitchPolarity, true);
 
-        updateKF = new Thread(() ->  {
+        updateKF = new Thread(() -> {
             while (true) {
                 updateFeedForward();
                 try {
@@ -146,6 +147,11 @@ public class Tilter extends TilterBase {
     @Override
     public boolean isAtTargetPos() {
         return motor.pidAtTarget();
+    }
+
+    @Override
+    public void setVelocity(double vel) {
+        motor.set(vel);
     }
 
     @Override
