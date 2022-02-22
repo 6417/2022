@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.drive.Vector2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.Joysticks;
+import frc.robot.subsystems.climber.TelescopeArm.Constants;
 import frc.robot.subsystems.climber.base.TilterBase;
 
 public class Tilter extends TilterBase {
@@ -26,6 +27,10 @@ public class Tilter extends TilterBase {
     private static final boolean enabled = true;
 
     public static final class Constants {
+        public class Positions {
+            public static final double traversalPosition = 0;
+        }
+
         public static final int motorId = 0;
         public static final FridolinsMotor.LimitSwitchPolarity forwardLimitSwitchPolarity = FridolinsMotor.LimitSwitchPolarity.kDisabled;
         public static final FridolinsMotor.LimitSwitchPolarity reverseLimitSwitchPolarity = FridolinsMotor.LimitSwitchPolarity.kDisabled;
@@ -94,6 +99,11 @@ public class Tilter extends TilterBase {
     @Override
     public void gotoZeroPoint() {
         motor.set(Constants.zeroingSpeed);
+    }
+
+    @Override
+    public void gotoTraversalPoint() {
+        motor.setPosition(Constants.Positions.traversalPosition);
     }
 
     @Override
