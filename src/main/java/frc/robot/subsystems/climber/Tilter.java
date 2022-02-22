@@ -160,6 +160,11 @@ public class Tilter extends TilterBase {
     }
 
     @Override
+    public boolean hasWrungContact() {
+        return hook.isWrungInHook();
+    }
+
+    @Override
     public void setVelocity(double vel) {
         motor.set(vel);
     }
