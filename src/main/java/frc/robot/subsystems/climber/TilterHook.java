@@ -9,6 +9,10 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class TilterHook extends Module {
+    public enum Hookstate {
+        locked, unlocked
+    }
+
     public static class Params {
         public final int id;
         public final boolean direction;
@@ -40,6 +44,7 @@ public class TilterHook extends Module {
 
     Params.Side right;
     Params.Side left;
+    Hookstate state;
 
     public TilterHook(Params params) {
         requires(PneumaticHandler.getInstance());
@@ -47,6 +52,7 @@ public class TilterHook extends Module {
         this.params = params;
         right = params.right;
         left = params.left;
+        state = Hookstate.locked;
         requires(solenoid);
     }
 
@@ -55,17 +61,18 @@ public class TilterHook extends Module {
         super.init();
     }
 
-
     public void lockHook() {
-        if (isLockable())
+        if (isLockable()) {
             solenoid.set(!params.direction);
-        else
+            state = Hookstate.locked;
+        } else
             DriverStation.reportWarning("hock was not locked", false);
 
     }
 
     public void openHook() {
         solenoid.set(params.direction);
+        state = Hookstate.unlocked;
     }
 
     public boolean isPipeInHook() {
@@ -74,6 +81,14 @@ public class TilterHook extends Module {
 
     public boolean isLockable() {
         return right.lockableSwitch.get() && left.lockableSwitch.get();
+    }
+
+    /**
+     * 
+     * @return the state of the hook : locked or unlocked
+     */
+    public Hookstate getState() {
+        return state;
     }
 
     @Override
