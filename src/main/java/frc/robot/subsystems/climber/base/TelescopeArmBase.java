@@ -31,6 +31,10 @@ public class TelescopeArmBase extends Module {
         return false;
     }
 
+    public boolean hasWrungContact() {
+        return false;
+    }
+
     public void resetEncoders() {
 
     }
