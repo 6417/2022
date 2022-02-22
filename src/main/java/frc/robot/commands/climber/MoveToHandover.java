@@ -3,14 +3,11 @@ package frc.robot.commands.climber;
 import ch.fridolins.fridowpi.command.Command;
 import frc.robot.subsystems.climber.TelescopeArm;
 
-public class CheckWrungContact extends Command{
-    public CheckWrungContact() {
-    }
-
+public class MoveToHandover extends Command{
     @Override
     public void initialize() {
-        TelescopeArm.getInstance().gotoCheckFristWrung();
-    }
+        TelescopeArm.getInstance().gotoHandover();
+    }    
 
     @Override
     public boolean isFinished() {
