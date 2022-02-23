@@ -2,6 +2,11 @@ package frc.robot.commands.climber;
 
 import ch.fridolins.fridowpi.command.Command;
 import ch.fridolins.fridowpi.command.ICommand;
+import frc.robot.commands.telescopeArm.CheckWrungContact;
+import frc.robot.commands.telescopeArm.MoveArmToFirstwrungPosition;
+import frc.robot.commands.telescopeArm.MoveArmToHandover;
+import frc.robot.commands.telescopeArm.RetractTelescopearm;
+import frc.robot.commands.tilter.MoveTilterToTraversalPosition;
 import frc.robot.subsystems.climber.TelescopeArm;
 import frc.robot.subsystems.climber.Tilter;
 
@@ -27,7 +32,7 @@ public class FirstWrung extends Command{
             if (TelescopeArm.getInstance().hasWrungContact()) {
                 retractTelescopeArm = new RetractTelescopearm();
                 if (retractTelescopeArm.isFinished()) {
-                    handover = new MoveToHandover();
+                    handover = new MoveArmToHandover();
                     if (handover.isFinished()) {
                         if (Tilter.getInstance().hasWrungContact()) {
                             end(false);
@@ -38,7 +43,7 @@ public class FirstWrung extends Command{
                 }
             }
             else {
-                new MoveToFirstwrungPosition();
+                new MoveArmToFirstwrungPosition();
                 end(true);
             }
         }

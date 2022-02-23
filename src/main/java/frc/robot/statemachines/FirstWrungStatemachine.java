@@ -13,6 +13,12 @@ import org.jeasy.states.core.FiniteStateMachineBuilder;
 import org.jeasy.states.core.TransitionBuilder;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.commands.climber.MoveToFirstWrungPosition;
+import frc.robot.commands.telescopeArm.CheckWrungContact;
+import frc.robot.commands.telescopeArm.MoveArmToFirstwrungPosition;
+import frc.robot.commands.telescopeArm.MoveArmToHandover;
+import frc.robot.commands.telescopeArm.RetractTelescopearm;
+import frc.robot.commands.tilter.MoveTilterToTraversalPosition;
 
 public class FirstWrungStatemachine {
     private static FirstWrungStatemachine instance;
@@ -52,49 +58,49 @@ public class FirstWrungStatemachine {
     private class MoveUp implements EventHandler<PressedStart> {
         @Override
         public void handleEvent(PressedStart arg0) throws Exception {
-            // TODO Auto-generated method stub
+            new MoveToFirstWrungPosition();
             System.out.println("moving up"); 
         }
     }
     private class MoveBackUp implements EventHandler<CheckFinished> {
         @Override
         public void handleEvent(CheckFinished arg0) throws Exception {
-            // TODO Auto-generated method stub
+            new MoveArmToFirstwrungPosition();
             System.out.println("moving back up"); 
         }
     }
     private class Check implements EventHandler<PressedStart> {
         @Override
         public void handleEvent(PressedStart arg0) throws Exception {
-            // TODO Auto-generated method stub
+            new CheckWrungContact();
             System.out.println("checking");
         }
     }
     private class Pull implements EventHandler<CheckPassed> {
         @Override
         public void handleEvent(CheckPassed arg0) throws Exception {
-            // TODO Auto-generated method stub
+            new RetractTelescopearm();
             System.out.println("pulling");
         }
     }
     private class PullBackUp implements EventHandler<TilterResetted> {
         @Override
         public void handleEvent(TilterResetted arg0) throws Exception {
-            // TODO Auto-generated method stub
+            new RetractTelescopearm();
             System.out.println("pulling");
         }
     }
     private class Handover implements EventHandler<PullFinished> {
         @Override
         public void handleEvent(PullFinished arg0) throws Exception {
-            // TODO Auto-generated method stub
+            new MoveArmToHandover();
             System.out.println("handing over");
         }
     }
     private class ResetTilter implements EventHandler<HandoverFinished> {
         @Override
         public void handleEvent(HandoverFinished arg0) throws Exception {
-            // TODO Auto-generated method stub
+            new MoveTilterToTraversalPosition();
             System.out.println("resetting tilter"); 
         }
     }
