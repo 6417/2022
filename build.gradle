@@ -69,6 +69,8 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
     implementation files('src/lib/FridoWPI/build/libs/FridoWPI.jar')
+
+    implementation files('src/lib/easystates/easy-states-2.0.0.jar')
 }
 
 // Simulation configuration (e.g. environment variables).
