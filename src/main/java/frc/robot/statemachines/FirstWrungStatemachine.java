@@ -39,14 +39,14 @@ public class FirstWrungStatemachine {
     private Transition finishing;
 
     // Events to fire
-    public class PressedStart extends AbstractEvent {}
-    public class MoveUpFinished extends AbstractEvent {}
-    public class CheckFinished extends AbstractEvent {}
-    public class CheckPassed extends AbstractEvent {}
-    public class PullFinished extends AbstractEvent {}
-    public class HandoverFinished extends AbstractEvent {}
-    public class TilterResetted extends AbstractEvent {}
-    public class HandoverCheckSuccess extends AbstractEvent {}
+    public static class PressedStart extends AbstractEvent {}
+    public static class MoveUpFinished extends AbstractEvent {}
+    public static class CheckFinished extends AbstractEvent {}
+    public static class CheckPassed extends AbstractEvent {}
+    public static class PullFinished extends AbstractEvent {}
+    public static class HandoverFinished extends AbstractEvent {}
+    public static class TilterResetted extends AbstractEvent {}
+    public static class HandoverCheckSuccess extends AbstractEvent {}
 
     // Event handlers
     private class MoveUp implements EventHandler<PressedStart> {
@@ -56,9 +56,9 @@ public class FirstWrungStatemachine {
             System.out.println("moving up"); 
         }
     }
-    private class MoveBackUp implements EventHandler<PressedStart> {
+    private class MoveBackUp implements EventHandler<CheckFinished> {
         @Override
-        public void handleEvent(PressedStart arg0) throws Exception {
+        public void handleEvent(CheckFinished arg0) throws Exception {
             // TODO Auto-generated method stub
             System.out.println("moving back up"); 
         }
@@ -219,5 +219,9 @@ public class FirstWrungStatemachine {
         } catch (FiniteStateMachineException e1) {
             DriverStation.reportError("[STATE MACHINE ERROR]", e1.getStackTrace());
         }
+    }
+
+    public State getCurrentState() {
+        return stateMachine.getCurrentState();
     }
 }
