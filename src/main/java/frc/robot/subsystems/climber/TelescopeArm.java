@@ -1,15 +1,23 @@
 package frc.robot.subsystems.climber;
 
+import java.util.List;
+
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import ch.fridolins.fridowpi.initializer.Initialisable;
 import ch.fridolins.fridowpi.initializer.Initializer;
+import ch.fridolins.fridowpi.joystick.Binding;
+import ch.fridolins.fridowpi.joystick.JoystickHandler;
 import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
 import ch.fridolins.fridowpi.motors.FridolinsMotor;
 import ch.fridolins.fridowpi.motors.LimitSwitch;
 import ch.fridolins.fridowpi.pneumatics.FridoSolenoid;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Button;
+import frc.robot.Joysticks;
+import frc.robot.statemachines.FirstWrungStatemachine;
 import frc.robot.subsystems.climber.base.TelescopeArmBase;
 
 public class TelescopeArm extends TelescopeArmBase {
@@ -89,6 +97,7 @@ public class TelescopeArm extends TelescopeArmBase {
 
     private TelescopeArm() {
         requires(motors);
+        JoystickHandler.getInstance().bind(this);
     }
 
     public static TelescopeArmBase getInstance() {
@@ -213,6 +222,16 @@ public class TelescopeArm extends TelescopeArmBase {
     @Override
     public boolean isAtTarget() {
         return motors.left.pidAtTarget() && motors.right.pidAtTarget();
+    }
+
+    @Override
+    public List<Binding> getMappings() {
+        return List.of(
+            new Binding(Joysticks.Drive,
+                        () -> 3,
+                        Button::whenPressed,
+                        new InstantCommand(() -> FirstWrungStatemachine.getInstance().fireEvent(new FirstWrungStatemachine.PressedStart())))
+        );
     }
 
     @Override

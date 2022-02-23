@@ -1,6 +1,7 @@
-package frc.robot.commands.climber;
+package frc.robot.commands.telescopeArm;
 
 import ch.fridolins.fridowpi.command.Command;
+import frc.robot.statemachines.FirstWrungStatemachine;
 import frc.robot.subsystems.climber.TelescopeArm;
 
 public class RetractTelescopearm extends Command{
@@ -9,6 +10,12 @@ public class RetractTelescopearm extends Command{
         super.initialize();
         TelescopeArm.getInstance().retract();
     }    
+
+    @Override
+    public void end(boolean interrupted) {
+        FirstWrungStatemachine.getInstance().fireEvent(new FirstWrungStatemachine.PullFinished());
+        super.end(interrupted);
+    }
 
     @Override
     public boolean isFinished() {

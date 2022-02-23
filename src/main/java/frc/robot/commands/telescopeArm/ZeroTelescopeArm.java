@@ -1,4 +1,4 @@
-package frc.robot.commands.climber;
+package frc.robot.commands.telescopeArm;
 
 import ch.fridolins.fridowpi.command.Command;
 import frc.robot.subsystems.climber.TelescopeArm;

@@ -1,17 +1,18 @@
 package frc.robot.commands.climber;
 
-import ch.fridolins.fridowpi.command.Command;
-import frc.robot.subsystems.climber.TelescopeArm;
+import ch.fridolins.fridowpi.command.ParallelCommandGroup;
+import frc.robot.commands.telescopeArm.MoveArmToFirstwrungPosition;
+import frc.robot.commands.tilter.MoveTilterToTraversalPosition;
+import frc.robot.statemachines.FirstWrungStatemachine;
 
-public class MoveToFirstwrungPosition extends Command{
-    @Override
-    public void initialize() {
-        TelescopeArm.getInstance().gotoFirstWrung();
-        requires(TelescopeArm.getInstance());
+public class MoveToFirstWrungPosition extends ParallelCommandGroup{
+    public MoveToFirstWrungPosition() {
+        addCommands(new MoveArmToFirstwrungPosition(), new MoveTilterToTraversalPosition());
     }
 
     @Override
-    public boolean isFinished() {
-        return TelescopeArm.getInstance().isAtTarget();
+    public void end(boolean interrupted) {
+        FirstWrungStatemachine.getInstance().fireEvent(new FirstWrungStatemachine.MoveUpFinished());
+        super.end(interrupted);
     }
 }
