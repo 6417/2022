@@ -3,7 +3,8 @@ package frc.robot.commands.climber;
 import ch.fridolins.fridowpi.command.ParallelCommandGroup;
 import frc.robot.commands.telescopeArm.MoveArmToFirstwrungPosition;
 import frc.robot.commands.tilter.MoveTilterToTraversalPosition;
-import frc.robot.statemachines.FirstWrungStatemachine;
+import frc.robot.statemachines.ClimberStatemachine;
+import frc.robot.statemachines.Events;
 
 public class MoveToFirstWrungPosition extends ParallelCommandGroup{
     public MoveToFirstWrungPosition() {
@@ -12,7 +13,7 @@ public class MoveToFirstWrungPosition extends ParallelCommandGroup{
 
     @Override
     public void end(boolean interrupted) {
-        FirstWrungStatemachine.getInstance().fireEvent(new FirstWrungStatemachine.MoveUpFinished());
+        ClimberStatemachine.getInstance().fireEvent(new Events.MoveUpFinished());
         super.end(interrupted);
     }
 }

@@ -1,7 +1,8 @@
 package frc.robot.commands.telescopeArm;
 
 import ch.fridolins.fridowpi.command.Command;
-import frc.robot.statemachines.FirstWrungStatemachine;
+import frc.robot.statemachines.ClimberStatemachine;
+import frc.robot.statemachines.Events;
 import frc.robot.subsystems.climber.TelescopeArm;
 
 public class MoveArmToFirstwrungPosition extends Command{
@@ -12,7 +13,7 @@ public class MoveArmToFirstwrungPosition extends Command{
 
     @Override
     public void end(boolean interrupted) {
-        FirstWrungStatemachine.getInstance().fireEvent(new FirstWrungStatemachine.MoveUpFinished());
+        ClimberStatemachine.getInstance().fireEvent(new Events.MoveUpFinished());
         super.end(interrupted);
     }
 

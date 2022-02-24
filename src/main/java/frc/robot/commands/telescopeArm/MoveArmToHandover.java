@@ -1,7 +1,8 @@
 package frc.robot.commands.telescopeArm;
 
 import ch.fridolins.fridowpi.command.Command;
-import frc.robot.statemachines.FirstWrungStatemachine;
+import frc.robot.statemachines.ClimberStatemachine;
+import frc.robot.statemachines.Events;
 import frc.robot.subsystems.climber.TelescopeArm;
 import frc.robot.subsystems.climber.Tilter;
 
@@ -20,14 +21,14 @@ public class MoveArmToHandover extends Command{
     @Override
     public void execute() {
         if (Tilter.getInstance().hasWrungContact() && !alreadyFired) {
-            FirstWrungStatemachine.getInstance().fireEvent(new FirstWrungStatemachine.HandoverCheckSuccess());
+            ClimberStatemachine.getInstance().fireEvent(new Events.HandoverCheckSuccess());
         }
         super.execute();
     }
 
     @Override
     public void end(boolean interrupted) {
-        FirstWrungStatemachine.getInstance().fireEvent(new FirstWrungStatemachine.HandoverFinished());
+        ClimberStatemachine.getInstance().fireEvent(new Events.HandoverFinished());
         super.end(interrupted);
     }
 

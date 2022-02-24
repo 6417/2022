@@ -1,7 +1,8 @@
 package frc.robot.commands.tilter;
 
 import ch.fridolins.fridowpi.command.Command;
-import frc.robot.statemachines.FirstWrungStatemachine;
+import frc.robot.statemachines.ClimberStatemachine;
+import frc.robot.statemachines.Events;
 import frc.robot.subsystems.climber.Tilter;
 
 public class MoveTilterToTraversalPosition extends Command{
@@ -12,7 +13,7 @@ public class MoveTilterToTraversalPosition extends Command{
 
     @Override
     public void end(boolean interrupted) {
-        FirstWrungStatemachine.getInstance().fireEvent(new FirstWrungStatemachine.TilterResetted());
+        ClimberStatemachine.getInstance().fireEvent(new Events.TilterResetted());
         super.end(interrupted);
     }
 

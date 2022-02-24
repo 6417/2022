@@ -17,7 +17,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.Joysticks;
-import frc.robot.statemachines.FirstWrungStatemachine;
+import frc.robot.statemachines.ClimberStatemachine;
+import frc.robot.statemachines.Events;
 import frc.robot.subsystems.climber.base.TelescopeArmBase;
 
 public class TelescopeArm extends TelescopeArmBase {
@@ -230,7 +231,7 @@ public class TelescopeArm extends TelescopeArmBase {
             new Binding(Joysticks.Drive,
                         () -> 3,
                         Button::whenPressed,
-                        new InstantCommand(() -> FirstWrungStatemachine.getInstance().fireEvent(new FirstWrungStatemachine.PressedStart())))
+                        new InstantCommand(() -> ClimberStatemachine.getInstance().fireEvent(new Events.PressedStart())))
         );
     }
 

@@ -1,7 +1,8 @@
 package frc.robot.commands.telescopeArm;
 
 import ch.fridolins.fridowpi.command.Command;
-import frc.robot.statemachines.FirstWrungStatemachine;
+import frc.robot.statemachines.ClimberStatemachine;
+import frc.robot.statemachines.Events;
 import frc.robot.subsystems.climber.TelescopeArm;
 
 public class CheckWrungContact extends Command{
@@ -19,7 +20,7 @@ public class CheckWrungContact extends Command{
     @Override
     public void execute() {
         if (TelescopeArm.getInstance().hasWrungContact() && !alreadyFired) {
-            FirstWrungStatemachine.getInstance().fireEvent(new FirstWrungStatemachine.CheckPassed());
+            ClimberStatemachine.getInstance().fireEvent(new Events.CheckPassed());
             alreadyFired = true;
         }
         super.execute();
@@ -27,7 +28,7 @@ public class CheckWrungContact extends Command{
 
     @Override
     public void end(boolean interrupted) {
-        FirstWrungStatemachine.getInstance().fireEvent(new FirstWrungStatemachine.CheckFinished());
+        ClimberStatemachine.getInstance().fireEvent(new Events.CheckFinished());
         super.end(interrupted);
     }
 
