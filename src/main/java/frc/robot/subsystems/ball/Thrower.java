@@ -15,14 +15,14 @@ public class Thrower extends ThrowerBase {
     private static final boolean enabled = true;
 
     public static final class Constants {
-        public static final int motorId = 0;
+        public static final int motorId = 31;
         public static final PidValues pid = new PidValues(0.0, 0.0, 0.0);
 
         public static final class UltraSonicSensors {
             public static final int pingRight = 0;
-            public static final int echoRight = 0;
-            public static final int pingLeft = 0;
-            public static final int echoLeft = 0;
+            public static final int echoRight = 1;
+            public static final int pingLeft = 2;
+            public static final int echoLeft = 3;
             public static final double sensorSeparation = 0.0;
         }
     }
@@ -36,6 +36,9 @@ public class Thrower extends ThrowerBase {
 
     private Thrower() {
         Initializer.getInstance().addInitialisable(this);
+
+        motor = new FridoCanSparkMax(Constants.motorId, CANSparkMaxLowLevel.MotorType.kBrushed);
+        requires(motor);
     }
 
     public static ThrowerBase getInstance() {
@@ -51,7 +54,6 @@ public class Thrower extends ThrowerBase {
     @Override
     public void init() {
         super.init();
-        motor = new FridoCanSparkMax(Constants.motorId, CANSparkMaxLowLevel.MotorType.kBrushed);
         motor.setPID(Constants.pid);
 
         usLeft = new UltrasonicSensor(Constants.UltraSonicSensors.pingLeft, Constants.UltraSonicSensors.echoLeft);
