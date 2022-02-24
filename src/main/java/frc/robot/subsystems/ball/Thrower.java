@@ -75,6 +75,11 @@ public class Thrower extends ThrowerBase {
     }
 
     @Override
+    public void setPercentage(double percentage) {
+        motor.set(percentage);
+    }
+
+    @Override
     public double getDistanceToTarget() {
         return usSensorArray.getFilteredDistance();
     }

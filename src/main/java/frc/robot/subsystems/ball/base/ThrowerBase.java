@@ -12,6 +12,10 @@ public class ThrowerBase extends Module {
     public void setVelocity(double velocity) {
     }
 
+    public void setPercentage(double percentage) {
+
+    }
+
     public double getDistanceToTarget() {
         return 0.0;
     }

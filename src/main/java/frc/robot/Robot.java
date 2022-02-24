@@ -1,7 +1,10 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.ball.Thrower;
+import frc.robot.subsystems.ball.base.ThrowerBase;
 
 public class Robot extends TimedRobot {
 
@@ -27,12 +30,18 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {}
 
+  ThrowerBase thrower;
+  Joystick jst;
+
   @Override
   public void teleopInit() {
+      thrower = Thrower.getInstance();
+      jst = new Joystick(0);
   }
 
   @Override
   public void teleopPeriodic() {
+      thrower.setPercentage(jst.getY());
   }
 
   @Override
