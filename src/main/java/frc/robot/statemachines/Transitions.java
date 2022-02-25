@@ -3,6 +3,7 @@ package frc.robot.statemachines;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jeasy.states.api.EventHandler;
 import org.jeasy.states.api.Transition;
 import org.jeasy.states.core.TransitionBuilder;
 
@@ -18,6 +19,11 @@ public class Transitions {
     private Transition startingHandover;
     private Transition handoverCheckFallback;
     private Transition resettingTilterToPull;
+    private Transition beginningTraversalpreparation;
+    private Transition beginExtendingArmToTraverse;
+    private Transition startingTraversalCheck;
+    private Transition traversalCheckFallback;
+    private Transition startPullAfterTraverse;
     private Transition finishing;
 
     public static Transitions getInstance() {
@@ -92,11 +98,50 @@ public class Transitions {
             .eventHandler(new EventHandlers.PullBackUp())
             .targetState(States.getInstance().pulling)
             .build();
+        
+        beginningTraversalpreparation = new TransitionBuilder()
+            .name("beginningTraversalpreparation")
+            .sourceState(States.getInstance().handingOver)
+            .eventType(Events.HandoverCheckSuccess.class)
+            .eventHandler(new EventHandlers.PrepareTraversal())
+            .targetState(States.getInstance().preparingTransition)
+            .build();
+
+        beginExtendingArmToTraverse = new TransitionBuilder()
+            .name("beginExtendingArmToTraverse")
+            .sourceState(States.getInstance().preparingTransition)
+            .eventType(Events.finishedTraversalPreparation.class)
+            .eventHandler(new EventHandlers.ExtendTelescopeArmToTraverse())
+            .targetState(States.getInstance().extendingToTraversal)
+            .build();
+
+        startingTraversalCheck = new TransitionBuilder()
+            .name("startingTraversalCheck")
+            .sourceState(States.getInstance().extendingToTraversal)
+            .eventType(Events.finishedExtendingArmToTraverse.class)
+            .eventHandler(new EventHandlers.CheckTraverse())
+            .targetState(States.getInstance().checkingTraversal)
+            .build();
+
+        traversalCheckFallback = new TransitionBuilder()
+            .name("traversalCheckFallback")
+            .sourceState(States.getInstance().checkingTraversal)
+            .eventType(Events.finishedCheckingTraversal.class)
+            .eventHandler(new EventHandlers.TraverseFallback())
+            .targetState(States.getInstance().preparingTransition)
+            .build();
+
+        startPullAfterTraverse = new TransitionBuilder()
+            .name("startPullAfterTraverse")
+            .sourceState(States.getInstance().checkingTraversal)
+            .eventType(Events.traverseCheckSuccessful.class)
+            .eventHandler(new EventHandlers.Traverse())
+            .targetState(States.getInstance().pulling)
+            .build();
 
         finishing = new TransitionBuilder()
             .name("finishing")
-            .sourceState(States.getInstance().handingOver)
-            .eventType(Events.HandoverCheckSuccess.class)
+            .eventType(Events.Finish.class)
             .targetState(States.getInstance().finished)
             .build();
 
@@ -108,7 +153,12 @@ public class Transitions {
         transitions.add(startingHandover);
         transitions.add(handoverCheckFallback);
         transitions.add(resettingTilterToPull);
-        transitions.add(finishing);
+        transitions.add(beginningTraversalpreparation);
+        transitions.add(beginExtendingArmToTraverse);
+        transitions.add(startingTraversalCheck);
+        transitions.add(traversalCheckFallback);
+        transitions.add(startPullAfterTraverse);
+        // transitions.add(finishing);
     }
 
     public Set<Transition> getTransitions() {

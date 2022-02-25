@@ -1,5 +1,6 @@
 package frc.robot.statemachines;
 
+import org.jeasy.states.api.Event;
 import org.jeasy.states.api.EventHandler;
 
 import frc.robot.commands.climber.MoveToFirstWrungPosition;
@@ -8,6 +9,10 @@ import frc.robot.commands.telescopeArm.MoveArmToFirstwrungPosition;
 import frc.robot.commands.telescopeArm.MoveArmToHandover;
 import frc.robot.commands.telescopeArm.RetractTelescopearm;
 import frc.robot.commands.tilter.MoveTilterToTraversalPosition;
+import frc.robot.statemachines.Events.HandoverCheckSuccess;
+import frc.robot.statemachines.Events.finishedCheckingTraversal;
+import frc.robot.statemachines.Events.finishedTraversalPreparation;
+import frc.robot.statemachines.Events.traverseCheckSuccessful;
 
 public class EventHandlers {
     public static class MoveUp implements EventHandler<Events.PressedStart> {
@@ -57,6 +62,46 @@ public class EventHandlers {
         public void handleEvent(Events.HandoverFinished arg0) throws Exception {
             new MoveTilterToTraversalPosition();
             System.out.println("resetting tilter"); 
+        }
+    }
+
+    public static class PrepareTraversal implements EventHandler<Events.HandoverCheckSuccess> {
+        @Override
+        public void handleEvent(HandoverCheckSuccess arg0) throws Exception {
+            // TODO Auto-generated method stub
+            System.out.println("preparingTraversal");
+        }
+    }
+
+    public static class ExtendTelescopeArmToTraverse implements EventHandler<Events.finishedTraversalPreparation> {
+        @Override
+        public void handleEvent(finishedTraversalPreparation arg0) throws Exception {
+            // TODO Auto-generated method stub
+            System.out.println("extending Telescope arm"); 
+        }
+    }
+
+    public static class CheckTraverse implements EventHandler<Events.finishedExtendingArmToTraverse> {
+        @Override
+        public void handleEvent(Events.finishedExtendingArmToTraverse arg0) throws Exception {
+            // TODO Auto-generated method stub
+            System.out.println("checking traversal"); 
+        }
+    }
+
+    public static class TraverseFallback implements EventHandler<Events.finishedCheckingTraversal> {
+        @Override
+        public void handleEvent(finishedCheckingTraversal arg0) throws Exception {
+            // TODO Auto-generated method stub
+            System.out.println("traverse check fallback");
+        }
+    }
+
+    public static class Traverse implements EventHandler<Events.traverseCheckSuccessful> {
+        @Override
+        public void handleEvent(traverseCheckSuccessful arg0) throws Exception {
+            // TODO Auto-generated method stub
+            System.out.println("traversing"); 
         }
     }
 }

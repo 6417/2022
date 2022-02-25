@@ -22,6 +22,9 @@ public class States {
     public State pulling;
     public State handingOver;
     public State resettingTilter;
+    public State preparingTransition;
+    public State extendingToTraversal;
+    public State checkingTraversal;
     public State finished;
 
     private Set<State> states;
@@ -36,6 +39,10 @@ public class States {
         pulling = new State("pulling");
         handingOver = new State("checkingHandover");
         resettingTilter = new State("resettingTilter");
+        preparingTransition = new State("preparingTransition");
+        checkingTraversal = new State("checkingTraversal");
+        extendingToTraversal = new State("extendingToTraversal");
+
         finished = new State("finished");
 
         states.add(started);
@@ -45,6 +52,9 @@ public class States {
         states.add(pulling);
         states.add(handingOver);
         states.add(resettingTilter);
+        states.add(preparingTransition);
+        states.add(extendingToTraversal);
+        states.add(checkingTraversal);
         states.add(finished);
     }
 

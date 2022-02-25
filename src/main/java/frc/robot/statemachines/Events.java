@@ -11,4 +11,9 @@ public class Events {
     public static class HandoverFinished extends AbstractEvent {}
     public static class TilterResetted extends AbstractEvent {}
     public static class HandoverCheckSuccess extends AbstractEvent {}
+    public static class finishedTraversalPreparation extends AbstractEvent {}
+    public static class finishedExtendingArmToTraverse extends AbstractEvent {}
+    public static class finishedCheckingTraversal extends AbstractEvent {}
+    public static class traverseCheckSuccessful extends AbstractEvent {}
+    public static class Finish extends AbstractEvent {}
 }
