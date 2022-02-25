@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.Joysticks;
 import frc.robot.statemachines.ClimberStatemachine;
 import frc.robot.statemachines.Events;
+import frc.robot.subsystems.climber.Tilter.Constants;
 import frc.robot.subsystems.climber.base.TelescopeArmBase;
 
 public class TelescopeArm extends TelescopeArmBase {
@@ -39,6 +40,7 @@ public class TelescopeArm extends TelescopeArmBase {
         public static final class Heights {
             public static final double firstWrung = 0;
             public static final double checkFirst = 0;
+            public static final double traversalPreparationHeight = 0;
             public static final double traversalHeight = 0;
             public static final double extended = 0;
             public static final double handover = 0;
@@ -165,6 +167,11 @@ public class TelescopeArm extends TelescopeArmBase {
     @Override
     public void gotoCheckFristWrung() {
         gotoPos(Constants.Heights.checkFirst);
+    }
+
+    @Override
+    public void gotoTraversalWrungPreparation() {
+        gotoPos(Constants.Heights.traversalPreparationHeight);
     }
 
     @Override

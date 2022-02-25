@@ -6,6 +6,14 @@ public class TilterBase extends Module {
     public void gotoZeroPoint() {
     }
 
+    public void gotoHandoverPoint() {
+
+    }
+
+    public void gotoTraversalpreparationPoint() {
+
+    }
+
     public void gotoTraversalPoint() {
 
     }

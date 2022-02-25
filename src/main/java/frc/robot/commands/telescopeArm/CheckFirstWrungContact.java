@@ -5,10 +5,10 @@ import frc.robot.statemachines.ClimberStatemachine;
 import frc.robot.statemachines.Events;
 import frc.robot.subsystems.climber.TelescopeArm;
 
-public class CheckWrungContact extends Command{
+public class CheckFirstWrungContact extends Command{
     boolean alreadyFired;
 
-    public CheckWrungContact() {
+    public CheckFirstWrungContact() {
         alreadyFired = false;
     }
 

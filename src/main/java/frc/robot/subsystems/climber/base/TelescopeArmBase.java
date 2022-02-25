@@ -10,6 +10,10 @@ public class TelescopeArmBase extends Module {
     public void gotoCheckFristWrung() {
 
     }
+
+    public void gotoTraversalWrungPreparation() {
+
+    }
     
     public void gotoTraversalWrung() {
         

@@ -4,11 +4,16 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.jeasy.states.api.Event;
 import org.jeasy.states.api.EventHandler;
 
+import frc.robot.commands.climber.BeginTraversing;
 import frc.robot.commands.climber.MoveToFirstWrungPosition;
-import frc.robot.commands.telescopeArm.CheckWrungContact;
+import frc.robot.commands.climber.PrepareTraverse;
+import frc.robot.commands.climber.FinishTraverse;
+import frc.robot.commands.telescopeArm.CheckFirstWrungContact;
 import frc.robot.commands.telescopeArm.MoveArmToFirstwrungPosition;
 import frc.robot.commands.telescopeArm.MoveArmToHandover;
+import frc.robot.commands.telescopeArm.MoveArmToTraversalPosition;
 import frc.robot.commands.telescopeArm.RetractTelescopearm;
+import frc.robot.commands.tilter.MoveTilterToHandoverPosition;
 import frc.robot.commands.tilter.MoveTilterToTraversalPosition;
 import frc.robot.statemachines.Events.HandoverCheckSuccess;
 import frc.robot.statemachines.Events.finishedCheckingTraversal;
@@ -33,7 +38,7 @@ public class EventHandlers {
     public static class Check implements EventHandler<Events.PressedStart> {
         @Override
         public void handleEvent(Events.PressedStart arg0) throws Exception {
-            CommandScheduler.getInstance().schedule(new CheckWrungContact());
+            CommandScheduler.getInstance().schedule(new CheckFirstWrungContact());
             System.out.println("checking");
         }
     }
@@ -69,7 +74,7 @@ public class EventHandlers {
     public static class PrepareTraversal implements EventHandler<Events.HandoverCheckSuccess> {
         @Override
         public void handleEvent(HandoverCheckSuccess arg0) throws Exception {
-            // TODO Auto-generated method stub
+            CommandScheduler.getInstance().schedule(new PrepareTraverse());
             System.out.println("preparingTraversal");
         }
     }
@@ -77,7 +82,7 @@ public class EventHandlers {
     public static class ExtendTelescopeArmToTraverse implements EventHandler<Events.finishedTraversalPreparation> {
         @Override
         public void handleEvent(finishedTraversalPreparation arg0) throws Exception {
-            // TODO Auto-generated method stub
+            CommandScheduler.getInstance().schedule(new MoveArmToTraversalPosition());
             System.out.println("extending Telescope arm"); 
         }
     }
@@ -85,7 +90,7 @@ public class EventHandlers {
     public static class CheckTraverse implements EventHandler<Events.finishedExtendingArmToTraverse> {
         @Override
         public void handleEvent(Events.finishedExtendingArmToTraverse arg0) throws Exception {
-            // TODO Auto-generated method stub
+            CommandScheduler.getInstance().schedule(new BeginTraversing());
             System.out.println("checking traversal"); 
         }
     }
@@ -93,7 +98,7 @@ public class EventHandlers {
     public static class TraverseFallback implements EventHandler<Events.finishedCheckingTraversal> {
         @Override
         public void handleEvent(finishedCheckingTraversal arg0) throws Exception {
-            // TODO Auto-generated method stub
+            CommandScheduler.getInstance().schedule(new PrepareTraverse());
             System.out.println("traverse check fallback");
         }
     }
@@ -101,7 +106,7 @@ public class EventHandlers {
     public static class Traverse implements EventHandler<Events.traverseCheckSuccessful> {
         @Override
         public void handleEvent(traverseCheckSuccessful arg0) throws Exception {
-            // TODO Auto-generated method stub
+            CommandScheduler.getInstance().schedule(new FinishTraverse());
             System.out.println("traversing"); 
         }
     }
