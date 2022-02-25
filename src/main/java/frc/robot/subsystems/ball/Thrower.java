@@ -1,12 +1,11 @@
 package frc.robot.subsystems.ball;
 
 import ch.fridolins.fridowpi.initializer.Initializer;
-import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
+import ch.fridolins.fridowpi.motors.FridoFalcon500;
 import ch.fridolins.fridowpi.motors.FridolinsMotor;
 import ch.fridolins.fridowpi.motors.utils.PidValues;
 import ch.fridolins.fridowpi.sensors.UltrasonicSensor;
 import ch.fridolins.fridowpi.sensors.UltrasonicSensorArray;
-import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.subsystems.ball.base.ThrowerBase;
 
@@ -51,7 +50,7 @@ public class Thrower extends ThrowerBase {
     @Override
     public void init() {
         super.init();
-        motor = new FridoCanSparkMax(Constants.motorId, CANSparkMaxLowLevel.MotorType.kBrushed);
+        motor = new FridoFalcon500(Constants.motorId);
         motor.setPID(Constants.pid);
 
         usLeft = new UltrasonicSensor(Constants.UltraSonicSensors.pingLeft, Constants.UltraSonicSensors.echoLeft);
@@ -82,5 +81,10 @@ public class Thrower extends ThrowerBase {
     @Override
     public Rotation2d getAngleToTarget() {
         return usSensorArray.getFilteredAngle();
+    }
+
+    @Override
+    public boolean hasReachedVelocity() {
+        return motor.pidAtTarget();
     }
 }

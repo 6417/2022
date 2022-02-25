@@ -19,4 +19,8 @@ public class ThrowerBase extends Module {
     public Rotation2d getAngleToTarget() {
         return new Rotation2d(0.0);
     }
+
+    public boolean hasReachedVelocity() {
+        return true;
+    }
 }
