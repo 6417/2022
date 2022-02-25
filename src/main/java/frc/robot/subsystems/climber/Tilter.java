@@ -28,7 +28,9 @@ public class Tilter extends TilterBase {
 
     public static final class Constants {
         public class Positions {
+            public static final double handoverPosition = 0;
             public static final double traversalPosition = 0;
+            public static final double traversalpreparationPoint = 0;
         }
 
         public static final int motorId = 0;
@@ -43,8 +45,12 @@ public class Tilter extends TilterBase {
         public static final PidValues pid = new PidValues(0.0, 0.0, 0.0);
         public static final double kF = 1.0;
 
+        public static final PidValues positionPid = new PidValues(0.0, 0.0, 0.0);
+        public static final double positionKF = 0.0;
+
         static {
             pid.setTolerance(0.0);
+            positionPid.setTolerance(0.0);
         }
     }
 
@@ -99,6 +105,16 @@ public class Tilter extends TilterBase {
     @Override
     public void gotoZeroPoint() {
         motor.set(Constants.zeroingSpeed);
+    }
+
+    @Override
+    public void gotoHandoverPoint() {
+        motor.setPosition(Constants.Positions.handoverPosition);
+    }
+
+    @Override
+    public void gotoTraversalpreparationPoint() {
+        motor.setPosition(Constants.Positions.traversalpreparationPoint);
     }
 
     @Override

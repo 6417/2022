@@ -5,11 +5,11 @@ import org.jeasy.states.api.Event;
 import org.jeasy.states.api.EventHandler;
 
 import frc.robot.commands.climber.MoveToFirstWrungPosition;
-import frc.robot.commands.telescopeArm.CheckWrungContact;
+import frc.robot.commands.telescopeArm.CheckFirstWrungContact;
 import frc.robot.commands.telescopeArm.MoveArmToFirstwrungPosition;
 import frc.robot.commands.telescopeArm.MoveArmToHandover;
 import frc.robot.commands.telescopeArm.RetractTelescopearm;
-import frc.robot.commands.tilter.MoveTilterToTraversalPosition;
+import frc.robot.commands.tilter.MoveTilterToHandoverPosition;
 import frc.robot.statemachines.Events.HandoverCheckSuccess;
 import frc.robot.statemachines.Events.finishedCheckingTraversal;
 import frc.robot.statemachines.Events.finishedTraversalPreparation;
