@@ -13,12 +13,14 @@ import frc.robot.subsystems.ball.base.TransportBase;
 public class Transport extends TransportBase{
     public static final class Constants {
         public static class Motor {
-            public static final int id = 0;
+            public static final int id = 34;
             public static final double speed = 1;
         }
     }
 
     private Transport() {
+        motor = new FridoCanSparkMax(Constants.Motor.id, MotorType.kBrushless);
+
         Initializer.getInstance().addInitialisable(this);
         JoystickHandler.getInstance().bind(this);
     }
@@ -43,7 +45,6 @@ public class Transport extends TransportBase{
     public void init() {
         super.init();
 
-        motor = new FridoCanSparkMax(Constants.Motor.id, MotorType.kBrushless);
         motor.factoryDefault();
         motor.setIdleMode(IdleMode.kBrake);
         motor.configEncoder(FridoFeedBackDevice.kBuildin, 42);

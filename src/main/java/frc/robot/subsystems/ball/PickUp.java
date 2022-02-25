@@ -16,12 +16,12 @@ import frc.robot.subsystems.ball.base.PickUpBase;
 public class PickUp extends PickUpBase {
     public static final class Constants {
         public static final class Brush {
-            public static final int id = 0;
+            public static final int id = 33;
             public static final double speed = 1;
         }
 
         public static final class Expander {
-            public static final int id = 0;
+            public static final int id = 32;
 
             public static final PidValues pidValues = new PidValues(0, 0, 0);
 
@@ -38,22 +38,21 @@ public class PickUp extends PickUpBase {
         public FridolinsMotor expander;
 
         public Motors() {
+            brush = new FridoCanSparkMax(Constants.Brush.id, MotorType.kBrushless);
+            expander = new FridoCanSparkMax(Constants.Expander.id, MotorType.kBrushless);
             Initializer.getInstance().addInitialisable(this);
         }
 
         @Override
         public void init() {
-            brush = new FridoCanSparkMax(Constants.Brush.id, MotorType.kBrushless);
-            expander = new FridoCanSparkMax(Constants.Expander.id, MotorType.kBrushless);
-
             brush.factoryDefault();
             expander.factoryDefault();
 
             brush.setIdleMode(IdleMode.kBrake);
             expander.setIdleMode(IdleMode.kBrake);
 
-            brush.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            expander.configEncoder(FridoFeedBackDevice.kBuildin, 42);
+            brush.configEncoder(FridoFeedBackDevice.kBuildin, 1);
+            expander.configEncoder(FridoFeedBackDevice.kBuildin, 1);
 
             PickUp.this.registerSubmodule(brush);
             PickUp.this.registerSubmodule(expander);
