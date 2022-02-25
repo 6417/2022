@@ -1,5 +1,6 @@
 package frc.robot.statemachines;
 
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.jeasy.states.api.Event;
 import org.jeasy.states.api.EventHandler;
 
@@ -18,49 +19,49 @@ public class EventHandlers {
     public static class MoveUp implements EventHandler<Events.PressedStart> {
         @Override
         public void handleEvent(Events.PressedStart arg0) throws Exception {
-            new MoveToFirstWrungPosition();
+            CommandScheduler.getInstance().schedule(new MoveToFirstWrungPosition());
             System.out.println("moving up"); 
         }
     }
     public static class MoveBackUp implements EventHandler<Events.CheckFinished> {
         @Override
         public void handleEvent(Events.CheckFinished arg0) throws Exception {
-            new MoveArmToFirstwrungPosition();
+            CommandScheduler.getInstance().schedule(new MoveArmToFirstwrungPosition());
             System.out.println("moving back up"); 
         }
     }
     public static class Check implements EventHandler<Events.PressedStart> {
         @Override
         public void handleEvent(Events.PressedStart arg0) throws Exception {
-            new CheckWrungContact();
+            CommandScheduler.getInstance().schedule(new CheckWrungContact());
             System.out.println("checking");
         }
     }
     public static class Pull implements EventHandler<Events.CheckPassed> {
         @Override
         public void handleEvent(Events.CheckPassed arg0) throws Exception {
-            new RetractTelescopearm();
+            CommandScheduler.getInstance().schedule(new RetractTelescopearm());
             System.out.println("pulling");
         }
     }
     public static class PullBackUp implements EventHandler<Events.TilterResetted> {
         @Override
         public void handleEvent(Events.TilterResetted arg0) throws Exception {
-            new RetractTelescopearm();
+            CommandScheduler.getInstance().schedule(new RetractTelescopearm());
             System.out.println("pulling");
         }
     }
     public static class Handover implements EventHandler<Events.PullFinished> {
         @Override
         public void handleEvent(Events.PullFinished arg0) throws Exception {
-            new MoveArmToHandover();
+            CommandScheduler.getInstance().schedule(new MoveArmToHandover());
             System.out.println("handing over");
         }
     }
     public static class ResetTilter implements EventHandler<Events.HandoverFinished> {
         @Override
         public void handleEvent(Events.HandoverFinished arg0) throws Exception {
-            new MoveTilterToTraversalPosition();
+            CommandScheduler.getInstance().schedule(new MoveTilterToTraversalPosition());
             System.out.println("resetting tilter"); 
         }
     }

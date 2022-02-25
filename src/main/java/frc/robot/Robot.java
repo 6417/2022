@@ -1,21 +1,11 @@
 package frc.robot;
 
-import java.util.List;
-
-import ch.fridolins.fridowpi.initializer.Initializer;
-import ch.fridolins.fridowpi.joystick.JoystickHandler;
-import ch.fridolins.fridowpi.pneumatics.PneumaticHandler;
-import ch.fridolins.fridowpi.sensors.Navx;
-import ch.fridolins.fridowpi.utils.CSVLogger;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.statemachines.ClimberStatemachine;
 import frc.robot.statemachines.Events;
-import frc.robot.subsystems.climber.AngleFilter;
-import frc.robot.subsystems.climber.Tilter;
 
 public class Robot extends TimedRobot {
 
