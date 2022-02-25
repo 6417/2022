@@ -2,10 +2,10 @@ package frc.robot.subsystems.ball;
 
 import ch.fridolins.fridowpi.command.ICommand;
 import ch.fridolins.fridowpi.initializer.Initializer;
-import frc.robot.commands.PickupCommand;
 import frc.robot.commands.RetractGripperCommand;
-import frc.robot.commands.ReverseflowCommand;
-import frc.robot.commands.ShootCommand;
+import frc.robot.commands.Ballsubsystem.PickupCommand;
+import frc.robot.commands.Ballsubsystem.ReverseflowCommand;
+import frc.robot.commands.Ballsubsystem.ShootCommand;
 import frc.robot.subsystems.ball.base.BallSubsystemBase;
 import frc.robot.subsystems.ball.base.PickUpBase;
 import frc.robot.subsystems.ball.base.ThrowerBase;

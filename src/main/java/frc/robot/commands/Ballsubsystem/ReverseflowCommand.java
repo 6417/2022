@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.Ballsubsystem;
 
 import ch.fridolins.fridowpi.command.Command;
 import frc.robot.subsystems.ball.PickUp;
