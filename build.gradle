@@ -70,7 +70,7 @@ dependencies {
 
     implementation files('src/lib/FridoWPI/build/libs/FridoWPI.jar')
 
-    implementation files('src/lib/easystates/easy-states-2.0.0.jar')
+    implementation group: 'org.jeasy', name: 'easy-states', version: '2.0.0'
 }
 
 // Simulation configuration (e.g. environment variables).
