@@ -5,6 +5,8 @@ import ch.fridolins.fridowpi.motors.LimitSwitch;
 import ch.fridolins.fridowpi.pneumatics.FridoSolenoid;
 import ch.fridolins.fridowpi.pneumatics.ISolenoid;
 import ch.fridolins.fridowpi.pneumatics.PneumaticHandler;
+import ch.fridolins.fridowpi.utils.LatchedBoolean;
+import ch.fridolins.fridowpi.utils.LatchedBooleanFalling;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -79,8 +81,9 @@ public class TilterHook extends Module {
         return right.pipeInHookSwitch.get() && left.pipeInHookSwitch.get();
     }
 
+    LatchedBoolean lockableLatchedBoolean = new LatchedBooleanFalling(false);
     public boolean isLockable() {
-        return right.lockableSwitch.get() && left.lockableSwitch.get();
+        return lockableLatchedBoolean.updateAndGet(right.lockableSwitch.get() && left.lockableSwitch.get());
     }
 
     /**
