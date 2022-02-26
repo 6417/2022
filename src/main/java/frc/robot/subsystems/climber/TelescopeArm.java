@@ -53,12 +53,12 @@ public class TelescopeArm extends TelescopeArmBase {
         }
     }
 
-    private static class Motors implements Initialisable{
+    private static class Motors implements Initialisable {
         private boolean initialized = false;
-        private FridoCanSparkMax rightFollower;
-        private FridoCanSparkMax leftFollower;
-        public FridoCanSparkMax left;
-        public FridoCanSparkMax right;
+        private FridolinsMotor rightFollower;
+        private FridolinsMotor leftFollower;
+        public FridolinsMotor left;
+        public FridolinsMotor right;
 
         public Motors() {
             Initializer.getInstance().addInitialisable(this);
@@ -72,17 +72,17 @@ public class TelescopeArm extends TelescopeArmBase {
             left = new FridoCanSparkMax(Constants.Ids.left, MotorType.kBrushless);
             leftFollower = new FridoCanSparkMax(Constants.Ids.leftFollower, MotorType.kBrushless);
 
-            rightFollower.follow(right);
-            leftFollower.follow(left);
+            rightFollower.follow(right, FridolinsMotor.DirectionType.followMaster);
+            leftFollower.follow(left, FridolinsMotor.DirectionType.followMaster);
 
             left.configEncoder(ch.fridolins.fridowpi.motors.FridolinsMotor.FridoFeedBackDevice.kBuildin, 1);
             right.configEncoder(ch.fridolins.fridowpi.motors.FridolinsMotor.FridoFeedBackDevice.kBuildin, 1);
 
-            right.enableForwardLimitSwitch(Constants.limitSwitchPolarity, true);
-            left.enableForwardLimitSwitch(Constants.limitSwitchPolarity, true);
+            right.enableForwardLimitSwitch(Constants.limitSwitchPolarity, false);
+            left.enableForwardLimitSwitch(Constants.limitSwitchPolarity, false);
 
-            right.enableReverseLimitSwitch(Constants.limitSwitchPolarity, false);
-            left.enableReverseLimitSwitch(Constants.limitSwitchPolarity, false);
+            right.enableReverseLimitSwitch(Constants.limitSwitchPolarity, true);
+            left.enableReverseLimitSwitch(Constants.limitSwitchPolarity, true);
         }
 
         @Override
@@ -138,6 +138,7 @@ public class TelescopeArm extends TelescopeArmBase {
 
     }
 
+    // locks code until motor is in a save position
     private void gotoRightSoftMax() {
         motors.right.stopMotor();
         motors.right.set(Constants.MayExceeded.speed);
@@ -146,6 +147,7 @@ public class TelescopeArm extends TelescopeArmBase {
         motors.right.stopMotor();
     }
 
+    // locks code until motor is in a save position
     private void gotoLeftSoftMax() {
         motors.left.stopMotor();
         motors.left.set(Constants.MayExceeded.speed);
@@ -212,19 +214,13 @@ public class TelescopeArm extends TelescopeArmBase {
     }
 
     @Override
-    public void extend() {
-        gotoPos(Constants.Heights.extended);
-    }
-
-    @Override
     public void init() {
         super.init();
-        // TODO: Find out which limit switch is used
-        bottomLimitSwitchRight = null;
-        bottomLimitSwitchLeft = null;
+        bottomLimitSwitchRight = motors.right.getReverseLimitSwitch();
+        bottomLimitSwitchLeft = motors.right.getReverseLimitSwitch();
 
-        wrungContactSwitchRight = null;
-        wrungContactSwitchLeft = null;
+        wrungContactSwitchRight = motors.right.getForwardLimitSwitch();
+        wrungContactSwitchLeft = motors.right.getForwardLimitSwitch();
     }
 
     @Override
@@ -235,7 +231,7 @@ public class TelescopeArm extends TelescopeArmBase {
     @Override
     public List<Binding> getMappings() {
         return List.of(
-            new Binding(Joysticks.Drive,
+                new Binding(Joysticks.Drive,
                         () -> 3,
                         Button::whenPressed,
                         new InstantCommand(() -> ClimberStatemachine.getInstance().fireEvent(new Events.PressedStart())))

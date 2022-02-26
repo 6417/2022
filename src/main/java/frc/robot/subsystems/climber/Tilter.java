@@ -10,10 +10,12 @@ import ch.fridolins.fridowpi.motors.FridolinsMotor;
 import java.util.List;
 import java.util.Optional;
 
+import ch.fridolins.fridowpi.motors.LimitSwitch;
 import ch.fridolins.fridowpi.motors.utils.PidValues;
 import ch.fridolins.fridowpi.sensors.Navx;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.Vector2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -25,6 +27,7 @@ import frc.robot.subsystems.climber.base.TilterBase;
 public class Tilter extends TilterBase {
     private static TilterBase instance = null;
     private static final boolean enabled = true;
+
 
     public static final class Constants {
         public class Positions {
@@ -40,7 +43,11 @@ public class Tilter extends TilterBase {
         public static final double zeroingSpeed = 0.0;
 
         // TODO: use corresponding limit switches
-        public static final TilterHook.Params hookParams = new TilterHook.Params(0, true, null, null);
+        private static DigitalInput rightHookWrungSwitch = new DigitalInput(1);
+        private static DigitalInput leftHookWrungSwitch = new DigitalInput(0);
+        private static DigitalInput rightHookLockable = new DigitalInput(3);
+        private static DigitalInput leftHookLockable = new DigitalInput(2);
+        public static final TilterHook.Params hookParams = new TilterHook.Params(0, true, new TilterHook.Params.Side(rightHookWrungSwitch::get, rightHookLockable::get), new TilterHook.Params.Side(leftHookWrungSwitch::get, leftHookLockable::get));
 
         public static final PidValues pid = new PidValues(0.0, 0.0, 0.0);
         public static final double kF = 1.0;

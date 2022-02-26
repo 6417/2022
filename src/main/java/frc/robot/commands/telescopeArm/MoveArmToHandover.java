@@ -23,7 +23,6 @@ public class MoveArmToHandover extends Command{
         if (Tilter.getInstance().hasWrungContact() && !alreadyFired) {
             ClimberStatemachine.getInstance().fireEvent(new Events.HandoverCheckSuccess());
         }
-        super.execute();
     }
 
     @Override

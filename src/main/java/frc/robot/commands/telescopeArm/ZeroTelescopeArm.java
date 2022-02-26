@@ -10,13 +10,11 @@ public class ZeroTelescopeArm extends Command {
 
     @Override
     public void initialize() {
-        super.initialize();
         TelescopeArm.getInstance().startZero();
     }
 
     @Override
     public void end(boolean interrupted) {
-        super.end(interrupted);
         TelescopeArm.getInstance().resetEncoders();
     }
 

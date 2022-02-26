@@ -5,7 +5,7 @@ import frc.robot.statemachines.ClimberStatemachine;
 import frc.robot.statemachines.Events;
 import frc.robot.subsystems.climber.TelescopeArm;
 
-public class CheckFirstWrungContact extends Command{
+public class CheckFirstWrungContact extends Command {
     boolean alreadyFired;
 
     public CheckFirstWrungContact() {
@@ -23,7 +23,6 @@ public class CheckFirstWrungContact extends Command{
             ClimberStatemachine.getInstance().fireEvent(new Events.CheckPassed());
             alreadyFired = true;
         }
-        super.execute();
     }
 
     @Override

@@ -14,7 +14,6 @@ public class MoveArmToFirstwrungPosition extends Command{
     @Override
     public void end(boolean interrupted) {
         ClimberStatemachine.getInstance().fireEvent(new Events.MoveUpFinished());
-        super.end(interrupted);
     }
 
     @Override

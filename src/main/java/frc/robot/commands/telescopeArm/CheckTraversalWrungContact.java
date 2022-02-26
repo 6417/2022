@@ -23,13 +23,11 @@ public class CheckTraversalWrungContact extends Command{
             ClimberStatemachine.getInstance().fireEvent(new Events.traverseCheckSuccessful());
             alreadyFired = true;
         }
-        super.execute();
     }
 
     @Override
     public void end(boolean interrupted) {
         ClimberStatemachine.getInstance().fireEvent(new Events.finishedCheckingTraversal());
-        super.end(interrupted);
     }
 
     @Override
