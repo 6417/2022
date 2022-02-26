@@ -12,7 +12,7 @@ import frc.robot.subsystems.ball.base.ThrowerBase;
 
 public class Thrower extends ThrowerBase {
     private static ThrowerBase instance = null;
-    private static final boolean enabled = true;
+    private static final boolean enabled = false;
 
     public static final class Constants {
         public static final int motorId = 31;
