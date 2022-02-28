@@ -49,38 +49,21 @@ public class Tilter extends TilterBase {
         private static DigitalInput leftHookLockable = new DigitalInput(2);
         public static final TilterHook.Params hookParams = new TilterHook.Params(0, true, new TilterHook.Params.Side(rightHookWrungSwitch::get, rightHookLockable::get), new TilterHook.Params.Side(leftHookWrungSwitch::get, leftHookLockable::get));
 
-        public static final PidValues pid = new PidValues(0.0, 0.0, 0.0);
-        public static final double kF = 1.0;
-
-        public static final PidValues positionPid = new PidValues(0.0, 0.0, 0.0);
-        public static final double positionKF = 0.0;
+        public static final PidValues pid = new PidValues(2.0, 0.0, 0.8);
 
         static {
             pid.setTolerance(0.0);
-            positionPid.setTolerance(0.0);
         }
     }
 
     private FridolinsMotor motor;
     private TilterHook hook;
-    private Thread updateKF;
-    private Vector2d pointOfMass = new Vector2d(0.0, 0.0);
 
     private Tilter() {
         hook = new TilterHook(Constants.hookParams);
         requires(hook);
         Initializer.getInstance().addInitialisable(this);
         JoystickHandler.getInstance().bind(this);
-    }
-
-    private double calcFeedForward() {
-        return Constants.kF * (Math.cos(Navx.getInstance().getPitch()) * pointOfMass.x - Math.sin(Navx.getInstance().getPitch())) / Math.cos(Navx.getInstance().getPitch());
-    }
-
-    private void updateFeedForward() {
-        PidValues pid = Constants.pid;
-        pid.kF = Optional.of(calcFeedForward());
-        motor.setPID(Constants.pid);
     }
 
     @Override
@@ -94,19 +77,6 @@ public class Tilter extends TilterBase {
 
         motor.enableForwardLimitSwitch(Constants.forwardLimitSwitchPolarity, true);
         motor.enableReverseLimitSwitch(Constants.reverseLimitSwitchPolarity, true);
-
-        updateKF = new Thread(() -> {
-            while (true) {
-                updateFeedForward();
-                try {
-                    wait(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    return;
-                }
-            }
-        });
-        updateKF.start();
     }
 
     @Override
