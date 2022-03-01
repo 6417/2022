@@ -47,6 +47,7 @@ public class Transport extends TransportBase{
 
         motor.factoryDefault();
         motor.setIdleMode(IdleMode.kBrake);
+        motor.setInverted(true);
         motor.configEncoder(FridoFeedBackDevice.kBuildin, 42);
 
         Transport.this.registerSubmodule(motor);

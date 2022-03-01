@@ -90,4 +90,9 @@ public class Thrower extends ThrowerBase {
     public Rotation2d getAngleToTarget() {
         return usSensorArray.getFilteredAngle();
     }
+    
+    @Override
+    public boolean isAtTarget() {
+        return motor.pidAtTarget();
+    }
 }

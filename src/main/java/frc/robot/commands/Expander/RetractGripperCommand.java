@@ -1,8 +1,7 @@
-package frc.robot.commands;
+package frc.robot.commands.Expander;
 
 import ch.fridolins.fridowpi.command.Command;
 import frc.robot.subsystems.ball.PickUp;
-import frc.robot.subsystems.ball.base.PickUpBase;
 
 public class RetractGripperCommand extends Command{
     @Override

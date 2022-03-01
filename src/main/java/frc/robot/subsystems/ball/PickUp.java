@@ -1,5 +1,7 @@
 package frc.robot.subsystems.ball;
 
+import java.util.Optional;
+
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import ch.fridolins.fridowpi.initializer.Initialisable;
@@ -26,6 +28,10 @@ public class PickUp extends PickUpBase {
             public static final PidValues pidValues = new PidValues(0.17, 0, 0);
             public static final double speed = 0.15;
             public static final double angle = 9.65;
+
+            static {
+                pidValues.tolerance = Optional.of(0.1);
+            }
 
             public static final LimitSwitchPolarity first = LimitSwitchPolarity.kNormallyClosed;
         }
