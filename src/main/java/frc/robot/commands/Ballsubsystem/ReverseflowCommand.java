@@ -7,37 +7,26 @@ import frc.robot.subsystems.ball.base.PickUpBase;
 import frc.robot.subsystems.ball.base.TransportBase;
 
 public class ReverseflowCommand extends Command{
-    TransportBase transportModule;
-    PickUpBase pickupModule;
-
-    public ReverseflowCommand(TransportBase transportModule, PickUpBase pickUpModule) {
-        this.transportModule = transportModule;
-        this.pickupModule = pickUpModule;
-    }
-
     @Override
     public void initialize() {
-        super.initialize();
-        addRequirements(transportModule, pickupModule);
     }
 
     @Override
     public void execute() {
-        super.execute();
-        pickupModule.openExpander();
-        transportModule.reverse();
-        pickupModule.reverseBrush();
+        PickUp.getInstance().openExpander();
+        Transport.getInstance().reverse();
+        PickUp.getInstance().reverseBrush();
     }
 
     @Override
     public boolean isFinished() {
-        return super.isFinished();
+        return false;
     }
 
     @Override
     public void end(boolean interrupted) {
-        super.end(interrupted);
         Transport.getInstance().stop();
+        PickUp.getInstance().closeExpander();
         PickUp.getInstance().stopBrush();
     }
 }

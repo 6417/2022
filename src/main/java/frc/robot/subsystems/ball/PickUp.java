@@ -1,35 +1,31 @@
 package frc.robot.subsystems.ball;
 
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import ch.fridolins.fridowpi.initializer.Initialisable;
 import ch.fridolins.fridowpi.initializer.Initializer;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
 import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
-import ch.fridolins.fridowpi.motors.FridolinsMotor;
 import ch.fridolins.fridowpi.motors.FridolinsMotor.FridoFeedBackDevice;
 import ch.fridolins.fridowpi.motors.FridolinsMotor.IdleMode;
 import ch.fridolins.fridowpi.motors.FridolinsMotor.LimitSwitchPolarity;
 import ch.fridolins.fridowpi.motors.utils.PidValues;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.ZeroExpander;
 import frc.robot.subsystems.ball.base.PickUpBase;
 
 public class PickUp extends PickUpBase {
     public static final class Constants {
         public static final class Brush {
             public static final int id = 33;
-            public static final double speed = 1;
+            public static final double speed = 0.3;
         }
 
         public static final class Expander {
             public static final int id = 32;
 
             public static final PidValues pidValues = new PidValues(0.17, 0, 0);
-
-            public static final double angle = 8;
+            public static final double speed = 0.15;
+            public static final double angle = 9.65;
 
             public static final LimitSwitchPolarity first = LimitSwitchPolarity.kNormallyClosed;
         }
@@ -93,10 +89,9 @@ public class PickUp extends PickUpBase {
         motors.init();
 
         motors.expander.setPID(Constants.Expander.pidValues);
+        motors.expander.getPIDController().setOutputRange(-Constants.Expander.speed, Constants.Expander.speed);
 
         motors.expander.enableReverseLimitSwitch(Constants.Expander.first, true);
-
-        motors.expander.getPIDController().setOutputRange(-0.2, 0.2);
     }
 
     @Override

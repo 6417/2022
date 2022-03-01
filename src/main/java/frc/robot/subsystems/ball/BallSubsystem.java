@@ -50,24 +50,4 @@ public class BallSubsystem extends BallSubsystemBase {
     public void setShooterToVelocity() {
         this.throwerSubmodule.setVelocity(this.throwerSubmodule.getRequiredVelocity());
     };
-
-    @Override
-    public ICommand getShootCommand() {
-        return new ShootCommand(transportSubmodule);
-    };
-
-    @Override
-    public ICommand getPickupCommand() {
-        return new PickupCommand(pickUpSubmodule, transportSubmodule);
-    };
-
-    @Override
-    public ICommand getRetractCommand() {
-        return new RetractGripperCommand(pickUpSubmodule);
-    };
-
-    @Override
-    public ICommand getReverseFlowCommand() {
-        return new ReverseflowCommand(transportSubmodule, pickUpSubmodule);
-    };
 }
