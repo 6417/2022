@@ -42,6 +42,8 @@ public class BallSubsystem extends BallSubsystemBase {
         requires(Thrower.getInstance());
         requires(Transport.getInstance());
         Initializer.getInstance().addInitialisable(this);
+
+        JoystickHandler.getInstance().bind(this);
     }
 
     @Override
@@ -52,8 +54,6 @@ public class BallSubsystem extends BallSubsystemBase {
         transportSubmodule = Transport.getInstance();
 
         registerSubmodule(pickUpSubmodule, throwerSubmodule, transportSubmodule);
-
-        JoystickHandler.getInstance().bind(this);
     }
 
     public void setShooterToVelocity() {

@@ -22,8 +22,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        BallSubsystem.getInstance();
         JoystickHandler.getInstance().setupJoysticks(List.of(() -> 0));
+        BallSubsystem.getInstance();
         Initializer.getInstance().init();
     }
 
