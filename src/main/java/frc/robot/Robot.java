@@ -3,7 +3,6 @@ package frc.robot;
 import java.util.List;
 
 import ch.fridolins.fridowpi.initializer.Initializer;
-import ch.fridolins.fridowpi.joystick.IJoystickId;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;

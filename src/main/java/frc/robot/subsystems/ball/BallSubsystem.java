@@ -2,9 +2,11 @@ package frc.robot.subsystems.ball;
 
 import java.util.List;
 
+import ch.fridolins.fridowpi.command.Command;
 import ch.fridolins.fridowpi.initializer.Initializer;
 import ch.fridolins.fridowpi.joystick.Binding;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
@@ -26,6 +28,9 @@ public class BallSubsystem extends BallSubsystemBase {
     private ThrowerBase throwerSubmodule;
     private boolean isPickingUp;
 
+    private CommandBase startPickupCommand;
+    private CommandBase endPickupCommand;
+
     public static BallSubsystemBase getInstance() {
         if (instance == null) {
             if (enabled) {
@@ -44,6 +49,9 @@ public class BallSubsystem extends BallSubsystemBase {
         Initializer.getInstance().addInitialisable(this);
 
         JoystickHandler.getInstance().bind(this);
+
+        startPickupCommand = new StartpickupCommand();
+        endPickupCommand = new EndPickup();
     }
 
     @Override
@@ -63,11 +71,17 @@ public class BallSubsystem extends BallSubsystemBase {
     public void togglePickup() {
         if (!isPickingUp) {
             isPickingUp = true;
-            CommandScheduler.getInstance().schedule(new StartpickupCommand());
+            if (CommandScheduler.getInstance().isScheduled(endPickupCommand))
+                CommandScheduler.getInstance().cancel(endPickupCommand);
+
+            CommandScheduler.getInstance().schedule(startPickupCommand);
         }
         else {
             isPickingUp = false;
-            CommandScheduler.getInstance().schedule(new EndPickup());
+            if (CommandScheduler.getInstance().isScheduled(startPickupCommand))
+                CommandScheduler.getInstance().cancel(startPickupCommand);
+
+            CommandScheduler.getInstance().schedule(endPickupCommand);
         }
     }
 
@@ -76,8 +90,7 @@ public class BallSubsystem extends BallSubsystemBase {
         return List.of(
             new Binding(() -> 0, () -> 1, Button::whileHeld, new ShootCommand()),
             new Binding(() -> 0, () -> 2, Button::whenPressed, new InstantCommand(this::togglePickup)),
-            new Binding(() -> 0, () -> 7, Button::whileHeld, new ReverseflowCommand()),
-            new Binding(() -> 0, () -> 3, Button::whenPressed, new InstantCommand(() -> System.out.println("hier")))
+            new Binding(() -> 0, () -> 7, Button::whileHeld, new ReverseflowCommand())
         );
     }
 }

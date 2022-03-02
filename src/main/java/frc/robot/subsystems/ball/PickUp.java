@@ -147,7 +147,6 @@ public class PickUp extends PickUpBase {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.addDoubleProperty("motorPosition", motors.expander::getEncoderTicks, null);
         super.initSendable(builder);
     }
 }
