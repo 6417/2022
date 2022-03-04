@@ -4,30 +4,35 @@ import java.util.List;
 
 import ch.fridolins.fridowpi.initializer.Initializer;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
-import edu.wpi.first.wpilibj.Joystick;
+import ch.fridolins.fridowpi.sensors.Navx;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.Expander.ZeroExpander;
-import frc.robot.subsystems.ball.BallSubsystem;
-import frc.robot.subsystems.ball.Thrower;
+import frc.robot.autonomous.PathviewerLoader;
+import frc.robot.autonomous.RamseteCommandGenerator;
+import frc.robot.subsystems.Drive;
 
 public class Robot extends TimedRobot {
-    Joystick jst;
-    JoystickButton zeroExpanderButton;
-    JoystickButton pickupButton;
-    JoystickButton reverseFlowButton;
-    JoystickButton shootButton;
+    private Command m_autonomousCommand;
 
+    static {
+    }
 
     @Override
     public void robotInit() {
-        JoystickHandler.getInstance().setupJoysticks(List.of(() -> 0));
-        BallSubsystem.getInstance();
+        JoystickHandler.getInstance().setupJoysticks(List.of(Joysticks.Drive));
+        Navx.setup(SPI.Port.kMXP);
+        // Navx.setYawOffset(-180);
+        Navx.getInstance();
+        Drive.getInstance();
+        Navx.getInstance().resetDisplacement();
+        Navx.getInstance().reset();
 
         Initializer.getInstance().init();
 
-        System.out.println("Robot init completed");
+        System.out.println("Initializer init");
     }
 
     @Override
@@ -45,29 +50,38 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        Navx.getInstance().reset();
+
+        String trajectoryJSON = "paths/output/TrajectoryRecording.wpilib.json";
+
+        Trajectory pathWeavertest = PathviewerLoader.loadTrajectory(trajectoryJSON);
+
+        m_autonomousCommand = RamseteCommandGenerator.generateRamseteCommand(pathWeavertest);
+
+        if (m_autonomousCommand != null) {
+            m_autonomousCommand.schedule();
+        }
     }
 
     @Override
     public void autonomousPeriodic() {
     }
 
-    // ThrowerBase thrower;
-
     @Override
     public void teleopInit() {
-        CommandScheduler.getInstance().cancelAll();
+        Navx.getInstance().reset();
 
+        if (m_autonomousCommand != null) {
+            m_autonomousCommand.cancel();
+        }
     }
 
     @Override
     public void teleopPeriodic() {
-        // Thrower.getInstance().setPercentage(JoystickHandler.getInstance().getJoystick((() -> 0)).getY());
-        // Thrower.getInstance().setVelocity(-5000);
     }
 
     @Override
     public void testInit() {
-        CommandScheduler.getInstance().cancelAll();
     }
 
     @Override
