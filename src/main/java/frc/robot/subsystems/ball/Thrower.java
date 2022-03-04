@@ -14,6 +14,7 @@ import java.util.Optional;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import frc.robot.subsystems.ball.base.ThrowerBase;
 
 public class Thrower extends ThrowerBase {
@@ -32,11 +33,11 @@ public class Thrower extends ThrowerBase {
         }
 
         public static final class UltraSonicSensors {
-            public static final int pingRight = 0;
-            public static final int echoRight = 1;
-            public static final int pingLeft = 2;
-            public static final int echoLeft = 3;
-            public static final double sensorSeparation = 0.0;
+            public static final int echoRight = 4;
+            public static final int pingRight = 5;
+            public static final int echoLeft = 6;
+            public static final int pingLeft = 7;
+            public static final double sensorSeparation = 360.0;
         }
     }
 
@@ -76,6 +77,8 @@ public class Thrower extends ThrowerBase {
         usRight = new UltrasonicSensor(Constants.UltraSonicSensors.pingRight, Constants.UltraSonicSensors.echoRight);
 
         usSensorArray = new UltrasonicSensorArray(usRight, usLeft, Constants.UltraSonicSensors.sensorSeparation);
+
+        Ultrasonic.setAutomaticMode(true);
 
         registerSubmodule(motor);
 

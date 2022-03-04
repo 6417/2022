@@ -33,7 +33,7 @@ public class BallSubsystem extends BallSubsystemBase {
     private CommandBase startPickupCommand;
     private CommandBase endPickupCommand;
 
-    private AnalogLightbarrier pickupBarrier;
+    private AnalogLightbarrier throwerBarrier;
     private AnalogLightbarrier throwerProtectionBarrier;
 
     public static BallSubsystemBase getInstance() {
@@ -51,9 +51,7 @@ public class BallSubsystem extends BallSubsystemBase {
         requires(PickUp.getInstance());
         requires(Thrower.getInstance());
         requires(Transport.getInstance());
-        // PickUp.getInstance().init();
-        // Thrower.getInstance().init();
-        // Transport.getInstance().init();
+
         // TODO: figure out why this is neccessary
         Thrower.getInstance().init();
 
@@ -64,7 +62,7 @@ public class BallSubsystem extends BallSubsystemBase {
         startPickupCommand = new StartpickupCommand();
         endPickupCommand = new EndPickup();
 
-        pickupBarrier = new AnalogLightbarrier(0, 1);
+        throwerBarrier = new AnalogLightbarrier(0, 1);
         throwerProtectionBarrier = new AnalogLightbarrier(1, 1);
     }
 
@@ -86,7 +84,7 @@ public class BallSubsystem extends BallSubsystemBase {
 
     @Override
     public boolean getShooterLightbarrier() {
-        return pickupBarrier.isTriggered();
+        return throwerBarrier.isTriggered();
     }
 
     public void togglePickup() {
