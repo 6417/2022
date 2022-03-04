@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.Expander.ZeroExpander;
 import frc.robot.subsystems.ball.BallSubsystem;
+import frc.robot.subsystems.ball.Thrower;
 
 public class Robot extends TimedRobot {
     Joystick jst;
@@ -23,7 +24,10 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         JoystickHandler.getInstance().setupJoysticks(List.of(() -> 0));
         BallSubsystem.getInstance();
+
         Initializer.getInstance().init();
+
+        System.out.println("Robot init completed");
     }
 
     @Override
@@ -53,11 +57,13 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         CommandScheduler.getInstance().cancelAll();
 
-        CommandScheduler.getInstance().schedule(new ZeroExpander());
     }
 
     @Override
-    public void teleopPeriodic() {}
+    public void teleopPeriodic() {
+        // Thrower.getInstance().setPercentage(JoystickHandler.getInstance().getJoystick((() -> 0)).getY());
+        // Thrower.getInstance().setVelocity(-5000);
+    }
 
     @Override
     public void testInit() {

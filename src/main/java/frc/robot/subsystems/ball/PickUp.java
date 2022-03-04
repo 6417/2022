@@ -97,6 +97,8 @@ public class PickUp extends PickUpBase {
         motors.expander.setPID(Constants.Expander.pidValues);
         motors.expander.getPIDController().setOutputRange(-Constants.Expander.speed, Constants.Expander.speed);
 
+        System.out.println("pickup init completed");
+
         motors.expander.enableReverseLimitSwitch(Constants.Expander.first, true);
     }
 

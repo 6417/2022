@@ -14,7 +14,7 @@ public class Transport extends TransportBase{
     public static final class Constants {
         public static class Motor {
             public static final int id = 34;
-            public static final double speed = 1;
+            public static final double speed = 0.75;
         }
     }
 
@@ -51,6 +51,8 @@ public class Transport extends TransportBase{
         motor.configEncoder(FridoFeedBackDevice.kBuildin, 42);
 
         Transport.this.registerSubmodule(motor);
+
+        System.out.println("called init of transport");
     }
 
     @Override
@@ -60,7 +62,8 @@ public class Transport extends TransportBase{
 
     @Override
     public void reverse() {
-        motor.set(-Constants.Motor.speed);
+        // motor.set(-Constants.Motor.speed);
+        motor.set(-0.2);
     }
 
     @Override

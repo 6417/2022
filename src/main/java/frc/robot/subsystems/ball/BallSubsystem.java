@@ -6,6 +6,7 @@ import ch.fridolins.fridowpi.command.Command;
 import ch.fridolins.fridowpi.initializer.Initializer;
 import ch.fridolins.fridowpi.joystick.Binding;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
+import ch.fridolins.fridowpi.sensors.AnalogLightbarrier;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -14,6 +15,7 @@ import frc.robot.commands.Ballsubsystem.EndPickup;
 import frc.robot.commands.Ballsubsystem.ReverseflowCommand;
 import frc.robot.commands.Ballsubsystem.ShootCommand;
 import frc.robot.commands.Ballsubsystem.StartpickupCommand;
+import frc.robot.commands.Tunnel.PullbackBallsCommand;
 import frc.robot.subsystems.ball.base.BallSubsystemBase;
 import frc.robot.subsystems.ball.base.PickUpBase;
 import frc.robot.subsystems.ball.base.ThrowerBase;
@@ -31,6 +33,9 @@ public class BallSubsystem extends BallSubsystemBase {
     private CommandBase startPickupCommand;
     private CommandBase endPickupCommand;
 
+    private AnalogLightbarrier pickupBarrier;
+    private AnalogLightbarrier throwerProtectionBarrier;
+
     public static BallSubsystemBase getInstance() {
         if (instance == null) {
             if (enabled) {
@@ -46,12 +51,21 @@ public class BallSubsystem extends BallSubsystemBase {
         requires(PickUp.getInstance());
         requires(Thrower.getInstance());
         requires(Transport.getInstance());
+        // PickUp.getInstance().init();
+        // Thrower.getInstance().init();
+        // Transport.getInstance().init();
+        // TODO: figure out why this is neccessary
+        Thrower.getInstance().init();
+
         Initializer.getInstance().addInitialisable(this);
 
         JoystickHandler.getInstance().bind(this);
 
         startPickupCommand = new StartpickupCommand();
         endPickupCommand = new EndPickup();
+
+        pickupBarrier = new AnalogLightbarrier(0, 1);
+        throwerProtectionBarrier = new AnalogLightbarrier(1, 1);
     }
 
     @Override
@@ -61,12 +75,19 @@ public class BallSubsystem extends BallSubsystemBase {
         throwerSubmodule = Thrower.getInstance();
         transportSubmodule = Transport.getInstance();
 
+        System.out.println("Ballsubsystem initialized");
+
         registerSubmodule(pickUpSubmodule, throwerSubmodule, transportSubmodule);
     }
 
     public void setShooterToVelocity() {
         this.throwerSubmodule.setVelocity(this.throwerSubmodule.getRequiredVelocity());
     };
+
+    @Override
+    public boolean getShooterLightbarrier() {
+        return pickupBarrier.isTriggered();
+    }
 
     public void togglePickup() {
         if (!isPickingUp) {
@@ -88,8 +109,10 @@ public class BallSubsystem extends BallSubsystemBase {
     @Override
     public List<Binding> getMappings() {
         return List.of(
-            new Binding(() -> 0, () -> 1, Button::whileHeld, new ShootCommand()),
+            new Binding(() -> 0, () -> 1, Button::whenPressed, new ShootCommand()),
             new Binding(() -> 0, () -> 2, Button::whenPressed, new InstantCommand(this::togglePickup)),
+            new Binding(() -> 0, () -> 3, Button::whileHeld, new InstantCommand(this::setShooterToVelocity)),
+            new Binding(() -> 0, () -> 4, Button::whenPressed, new InstantCommand(() -> Thrower.getInstance().setPercentage(0))),
             new Binding(() -> 0, () -> 7, Button::whileHeld, new ReverseflowCommand())
         );
     }
