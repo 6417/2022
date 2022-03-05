@@ -24,6 +24,10 @@ public class ThrowerBase extends Module {
         return new Rotation2d(0.0);
     }
 
+    public boolean isDistanceValid() {
+        return false;
+    }
+
     public boolean isAtTarget() {
         return false;
     }

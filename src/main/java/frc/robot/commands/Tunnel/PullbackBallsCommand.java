@@ -8,8 +8,8 @@ import frc.robot.subsystems.ball.Transport;
 public class PullbackBallsCommand extends Command{
     @Override
     public void initialize() {
-        Transport.getInstance().reverse();
         Thrower.getInstance().setPercentage(0.2);
+        Transport.getInstance().reverse();
     }
 
     @Override

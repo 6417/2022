@@ -109,8 +109,6 @@ public class BallSubsystem extends BallSubsystemBase {
         return List.of(
             new Binding(() -> 0, () -> 1, Button::whenPressed, new ShootCommand()),
             new Binding(() -> 0, () -> 2, Button::whenPressed, new InstantCommand(this::togglePickup)),
-            new Binding(() -> 0, () -> 3, Button::whileHeld, new InstantCommand(this::setShooterToVelocity)),
-            new Binding(() -> 0, () -> 4, Button::whenPressed, new InstantCommand(() -> Thrower.getInstance().setPercentage(0))),
             new Binding(() -> 0, () -> 7, Button::whileHeld, new ReverseflowCommand())
         );
     }

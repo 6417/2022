@@ -10,13 +10,7 @@ public class ExpandGripper extends Command{
     }
 
     @Override
-    public void end(boolean interrupted) {
-        System.out.println("Finished");
-    }
-
-    @Override
     public boolean isFinished() {
-        System.out.println(PickUp.getInstance().isAtTarget());
         return PickUp.getInstance().isAtTarget();
     }
 }

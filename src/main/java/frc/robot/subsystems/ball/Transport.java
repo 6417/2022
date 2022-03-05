@@ -14,7 +14,9 @@ public class Transport extends TransportBase{
     public static final class Constants {
         public static class Motor {
             public static final int id = 34;
-            public static final double speed = 0.75;
+            public static final double speed = 0.5;
+            public static final double shootSpeed = 0.75;
+            public static final double reverseSpeed = -1;
         }
     }
 
@@ -61,9 +63,13 @@ public class Transport extends TransportBase{
     }
 
     @Override
+    public void runShootspeed() {
+        motor.set(Constants.Motor.shootSpeed);
+    }
+
+    @Override
     public void reverse() {
-        // motor.set(-Constants.Motor.speed);
-        motor.set(-0.2);
+        motor.set(Constants.Motor.reverseSpeed);
     }
 
     @Override

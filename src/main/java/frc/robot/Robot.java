@@ -5,6 +5,8 @@ import java.util.List;
 import ch.fridolins.fridowpi.initializer.Initializer;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
 import ch.fridolins.fridowpi.sensors.Navx;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -13,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.autonomous.PathviewerLoader;
 import frc.robot.autonomous.RamseteCommandGenerator;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.ball.BallSubsystem;
 
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
@@ -22,8 +25,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        JoystickHandler.getInstance().setupJoysticks(List.of(Joysticks.Drive));
+        JoystickHandler.getInstance().setupJoysticks(List.of(Joysticks.Drive, Joysticks.SteeringWheel));
         Navx.setup(SPI.Port.kMXP);
+        BallSubsystem.getInstance();
         // Navx.setYawOffset(-180);
         Navx.getInstance();
         Drive.getInstance();
@@ -70,6 +74,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         Navx.getInstance().reset();
+        Drive.getInstance().resetOdometry(new Pose2d(0, 0, new Rotation2d(0)));
 
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();

@@ -9,6 +9,10 @@ public class TransportBase extends Module{
     public void run() {
     }
 
+    public void runShootspeed() {
+
+    }
+
     public void reverse() {
     }
 

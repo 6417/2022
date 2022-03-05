@@ -25,10 +25,10 @@ public class Thrower extends ThrowerBase {
         public static final int motorId = 31;
         public static final PidValues pid = new PidValues(1 * Math.pow(10, -4), 0.0, 0.0);
         // public static final PidValues pid = new PidValues(0.0, 0.0, 0.0);
-        public static final int velocityTarget = -5000;
+        public static final int velocityTarget = -4500;
 
         static {
-            pid.setTolerance(100);
+            pid.setTolerance(1000);
             pid.kF = Optional.of(0.00018);
         }
 
@@ -119,8 +119,14 @@ public class Thrower extends ThrowerBase {
     }
 
     @Override
+    public boolean isDistanceValid() {
+        return 600 < getDistanceToTarget() && getDistanceToTarget() < 1200;
+    } 
+
+    @Override
     public void initSendable(SendableBuilder builder) {
         builder.addDoubleProperty("Velocity", motor::getEncoderVelocity, null);
+        builder.addBooleanProperty("isDistanceValid", this::isDistanceValid, null);
         super.initSendable(builder);
     }
 }

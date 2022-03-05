@@ -3,7 +3,9 @@ package frc.robot;
 import ch.fridolins.fridowpi.joystick.IJoystickId;
 
 public enum Joysticks implements IJoystickId {
-    Drive(0);
+    Drive(0),
+    SteeringWheel(1);
+
     private final int port;
 
     private Joysticks(int id) {

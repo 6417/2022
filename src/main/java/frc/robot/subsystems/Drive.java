@@ -36,6 +36,7 @@ import frc.robot.Joysticks;
 import frc.robot.autonomous.RecordTrajectoryCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SpeedCommand;
+import frc.robot.subsystems.ball.Transport.Constants;
 import frc.robot.subsystems.base.DriveBase;
 
 public class Drive extends DriveBase {
@@ -47,9 +48,14 @@ public class Drive extends DriveBase {
         public static final class Speeds {
             public static final double slow = 0.375;
             public static final double normal = 1;
+            public static final double steeringSpeed = 0.5;
         }
 
-        public static final double encoderToMetersConversion = -22.14274406;
+        public static final double wheelPerimeter = 321.6;
+        public static final double transmission = 6.5625;
+        public static final int encoderResolution = 2048;
+
+        public static final double encoderToMetersConversion = (1000 / wheelPerimeter) * transmission * encoderResolution;
         public static final double trackWidthMeters = 0.5;
 
         public static final class PathWeaver {
@@ -124,9 +130,6 @@ public class Drive extends DriveBase {
             leftBackFollower.factoryDefault();
             leftFrontFollower.factoryDefault();
 
-            // right.setInverted(true);
-            // left.setInverted(true);
-
             right.setIdleMode(FridolinsMotor.IdleMode.kBrake);
             rightFrontFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
             rightBackFollower.setIdleMode(FridolinsMotor.IdleMode.kBrake);
@@ -138,22 +141,6 @@ public class Drive extends DriveBase {
             rightBackFollower.follow(right, FridolinsMotor.DirectionType.followMaster);
             leftBackFollower.follow(left, FridolinsMotor.DirectionType.followMaster);
             leftFrontFollower.follow(left, FridolinsMotor.DirectionType.followMaster);
-
-            // TODO: Maybe not necessary with falcon500 motors
-
-            // right.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            // rightFrontFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            // rightBackFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            // left.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            // leftBackFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-            // leftFrontFollower.configEncoder(FridoFeedBackDevice.kBuildin, 42);
-
-            // Drive.this.registerSubmodule(right);
-            // Drive.this.registerSubmodule(rightFrontFollower);
-            // Drive.this.registerSubmodule(rightBackFollower);
-            // Drive.this.registerSubmodule(left);
-            // Drive.this.registerSubmodule(leftBackFollower);
-            // Drive.this.registerSubmodule(leftFrontFollower);
 
             System.out.println("Motors init completed");
         }
@@ -167,12 +154,6 @@ public class Drive extends DriveBase {
     private Motors motors = new Motors();
 
     private Drive() {
-        // Initializer.getInstance().after(Navx.getInstance(), motors)
-        //         .then(this)
-        //         .then(JoystickHandler.getInstance()).close();
-        // ;
-        // Initializer.getInstance().removeInitialisable(motors);
-        // requires(motors);
         JoystickHandler.getInstance().bind(this);
     }
 
@@ -341,6 +322,7 @@ public class Drive extends DriveBase {
     }
 
     public void resetOdometry(Pose2d setPoint) {
+        resetSensors();
         odometry.resetPosition(setPoint, setPoint.getRotation());
         Navx.setYawOffset(setPoint.getRotation().getDegrees());
     }
@@ -351,8 +333,12 @@ public class Drive extends DriveBase {
     }
 
     public void drive() {
-        tankDrive.arcadeDrive(-JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getX() * this.speed,
-                JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getY() * this.speed);
+        // tankDrive.arcadeDrive(-JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getX() * this.speed,
+        //         JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getY() * this.speed, true);
+
+        double speed =  JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getY();
+        tankDrive.arcadeDrive(JoystickHandler.getInstance().getJoystick(Joysticks.SteeringWheel).getX() * speed,
+            speed * Constants.Speeds.normal);
     }
 
     public void setSpeed(double maxSpeed) {
