@@ -35,7 +35,11 @@ public class TelescopeArmBase extends Module {
 
     }
 
-    public boolean getBottomLimitSwitch() {
+    public boolean getBottomLimitSwitchRight() {
+        return false;
+    }
+
+    public boolean getBottomLimitSwitchLeft() {
         return false;
     }
 

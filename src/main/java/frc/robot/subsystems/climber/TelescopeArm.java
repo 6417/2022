@@ -193,8 +193,13 @@ public class TelescopeArm extends TelescopeArmBase {
     }
 
     @Override
-    public boolean getBottomLimitSwitch() {
-        return bottomLimitSwitchRight.get() && bottomLimitSwitchLeft.get();
+    public boolean getBottomLimitSwitchLeft() {
+       return bottomLimitSwitchLeft.get();
+    }
+
+    @Override
+    public boolean getBottomLimitSwitchRight() {
+        return bottomLimitSwitchRight.get();
     }
 
     @Override
@@ -215,12 +220,14 @@ public class TelescopeArm extends TelescopeArmBase {
 
     @Override
     public void init() {
-        super.init();
-        bottomLimitSwitchRight = motors.right.getReverseLimitSwitch();
-        bottomLimitSwitchLeft = motors.right.getReverseLimitSwitch();
+        bottomLimitSwitchRight = motors.right.getForwardLimitSwitch();
+        bottomLimitSwitchLeft = motors.left.getForwardLimitSwitch();
 
-        wrungContactSwitchRight = motors.right.getForwardLimitSwitch();
-        wrungContactSwitchLeft = motors.right.getForwardLimitSwitch();
+        wrungContactSwitchRight = motors.right.getReverseLimitSwitch();
+        wrungContactSwitchLeft = motors.left.getReverseLimitSwitch();
+
+        climberPidLeft = new PIDController(Constants.PID.climberPidLeft.kP, Constants.PID.climberPidLeft.kI, Constants.PID.climberPidRight.kD);
+        climberPidRight = new PIDController(Constants.PID.climberPidRight.kP, Constants.PID.climberPidRight.kI, Constants.PID.climberPidRight.kD);
     }
 
     @Override
@@ -242,6 +249,7 @@ public class TelescopeArm extends TelescopeArmBase {
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
         builder.addDoubleProperty("encoder pos", motors.right::getEncoderTicks, null);
-        builder.addBooleanProperty("bottom limit switch", this::getBottomLimitSwitch, null);
+        builder.addBooleanProperty("bottom limit switch right", this::getBottomLimitSwitchLeft, null);
+        builder.addBooleanProperty("bottom limit switch left", this::getBottomLimitSwitchRight, null);
     }
 }
