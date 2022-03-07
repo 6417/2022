@@ -26,6 +26,7 @@ import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConst
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.Joysticks;
 import frc.robot.autonomous.RecordTrajectoryCommand;
@@ -38,6 +39,7 @@ public class Drive extends DriveBase {
     private static final boolean enabled = true;
     private static DriveBase instance = null;
     private LinearFilter driveFilter;
+    private int driveDirection = 1;
     public static final class Constants {
         public static final class Speeds {
             public static final double slow = 0.375;
@@ -219,6 +221,16 @@ public class Drive extends DriveBase {
         System.out.println("Drive init completed");
     }
 
+    @Override
+    public void setDirectionToForward() {
+        driveDirection = 1;
+    }
+
+    @Override
+    public void setDirectionToReverse() {
+        driveDirection = -1;
+    }
+
     public void resetSensors() {
         Navx.getInstance().reset();
         odometry.resetPosition(new Pose2d(0, 0, new Rotation2d(0)), new Rotation2d(0));
@@ -256,17 +268,17 @@ public class Drive extends DriveBase {
     }
 
     private double getLeftWheelDistance() {
-        return -motors.left.getEncoderTicks() / Constants.Odometry.encoderToMetersConversion;
+        return -motors.left.getEncoderTicks() / Constants.Odometry.encoderToMetersConversion * driveDirection;
     }
 
     private double getRightWheelDistance() {
-        return motors.right.getEncoderTicks() / Constants.Odometry.encoderToMetersConversion;
+        return motors.right.getEncoderTicks() / Constants.Odometry.encoderToMetersConversion * driveDirection;
     }
 
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
         return new DifferentialDriveWheelSpeeds(
-                -motors.left.getEncoderVelocity() * 10 / (Constants.Odometry.encoderToMetersConversion),
-                motors.right.getEncoderVelocity() * 10 / (Constants.Odometry.encoderToMetersConversion));
+                -motors.left.getEncoderVelocity() * 10 / (Constants.Odometry.encoderToMetersConversion) * driveDirection,
+                motors.right.getEncoderVelocity() * 10 / (Constants.Odometry.encoderToMetersConversion) * driveDirection);
     }
 
     public Pose2d getPosition() {
@@ -329,14 +341,14 @@ public class Drive extends DriveBase {
     }
 
     private void updateOdometry() {
-        odometry.update(Rotation2d.fromDegrees(-Navx.getInstance().getAngle()), getLeftWheelDistance(),
+        odometry.update(Rotation2d.fromDegrees(-Navx.getInstance().getAngle() * driveDirection), getLeftWheelDistance(),
                 getRightWheelDistance());
     }
 
     public void drive() {
         // Getting the steer values from the joystick and the steering wheel
-        double steer = JoystickHandler.getInstance().getJoystick(Joysticks.SteeringWheel).getX() * 2;
-        double velocity = driveFilter.calculate(JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getY()) * speed;
+        double steer = JoystickHandler.getInstance().getJoystick(Joysticks.SteeringWheel).getX() * 2 * driveDirection;
+        double velocity = driveFilter.calculate(JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getY()) * speed * driveDirection;
 
         // Getting the sign of velocity and steer
         double velocitySign = Math.signum(velocity);
@@ -363,8 +375,8 @@ public class Drive extends DriveBase {
     }
 
     public void tankDriveVolts(double left, double right) {
-        motors.left.setVoltage(-left);
-        motors.right.setVoltage(right);
+        motors.left.setVoltage(-left * driveDirection);
+        motors.right.setVoltage(right * driveDirection);
         tankDrive.feed();
     }
 
@@ -379,7 +391,11 @@ public class Drive extends DriveBase {
                 new Binding(Constants.ButtonBindings.joystick, Constants.ButtonBindings.slowButton,
                         Button::toggleWhenPressed, new SpeedCommand()),
                 new Binding(Constants.ButtonBindings.joystick, Constants.ButtonBindings.recordButton, Button::whileHeld,
-                        new RecordTrajectoryCommand()));
+                        new RecordTrajectoryCommand()),
+                new Binding(Constants.ButtonBindings.joystick, () -> 11,
+                        Button::whenPressed, new InstantCommand(() -> setDirectionToForward())),
+                new Binding(Constants.ButtonBindings.joystick, () -> 12,
+                        Button::whenPressed, new InstantCommand(() -> setDirectionToReverse())));
     }
 
     @Override

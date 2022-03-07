@@ -47,6 +47,14 @@ public class DriveBase extends Module {
         return new PIDController(0.0,0.0,0.0);
     }
 
+    public void setDirectionToForward() {
+
+    }
+
+    public void setDirectionToReverse() {
+
+    }
+
     private double getLeftWheelDistance() {
         return 0;
     }

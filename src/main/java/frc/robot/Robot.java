@@ -56,12 +56,15 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         Navx.getInstance().reset();
 
-        String trajectoryJSON = "paths/output/straight.wpilib.json";
+        String trajectoryJSON = "paths/output/s spiral.wpilib.json";
         // String trajectoryJSON = "paths/output/GeradeAus3m.wpilib.json";
 
         Trajectory pathWeavertest = PathviewerLoader.loadTrajectory(trajectoryJSON);
 
         m_autonomousCommand = RamseteCommandGenerator.generateRamseteCommand(pathWeavertest);
+
+        Drive.getInstance().setDirectionToReverse();
+        // Drive.getInstance().setDirectionToForward();
 
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
