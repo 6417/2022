@@ -2,22 +2,17 @@ package frc.robot.subsystems;
 
 import java.util.List;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import ch.fridolins.fridowpi.initializer.Initializer;
 import ch.fridolins.fridowpi.initializer.Initialisable;
 import ch.fridolins.fridowpi.joystick.Binding;
 import ch.fridolins.fridowpi.joystick.IJoystickButtonId;
 import ch.fridolins.fridowpi.joystick.IJoystickId;
 import ch.fridolins.fridowpi.joystick.JoystickHandler;
-import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
 import ch.fridolins.fridowpi.motors.FridoFalcon500;
 import ch.fridolins.fridowpi.motors.FridolinsMotor;
-import ch.fridolins.fridowpi.motors.FridolinsMotor.FridoFeedBackDevice;
 import ch.fridolins.fridowpi.sensors.Navx;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -36,26 +31,28 @@ import frc.robot.Joysticks;
 import frc.robot.autonomous.RecordTrajectoryCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SpeedCommand;
-import frc.robot.subsystems.ball.Transport.Constants;
 import frc.robot.subsystems.base.DriveBase;
 
 public class Drive extends DriveBase {
 
     private static final boolean enabled = true;
     private static DriveBase instance = null;
-
+    private LinearFilter driveFilter;
     public static final class Constants {
         public static final class Speeds {
             public static final double slow = 0.375;
             public static final double normal = 1;
-            public static final double steeringSpeed = 0.5;
+            public static final double turningSpeed = 0.5;
         }
+
+        public static final int filterSamples = 20;
 
         public static final double wheelPerimeter = 321.6;
         public static final double transmission = 6.5625;
         public static final int encoderResolution = 2048;
 
-        public static final double encoderToMetersConversion = (1000 / wheelPerimeter) * transmission * encoderResolution;
+        public static final double encoderToMetersConversion = (1000 / wheelPerimeter) * transmission
+                * encoderResolution;
         public static final double trackWidthMeters = 0.5;
 
         public static final class PathWeaver {
@@ -155,6 +152,8 @@ public class Drive extends DriveBase {
 
     private Drive() {
         JoystickHandler.getInstance().bind(this);
+
+        driveFilter = LinearFilter.movingAverage(Constants.filterSamples);
     }
 
     public static DriveBase getInstance() {
@@ -333,12 +332,24 @@ public class Drive extends DriveBase {
     }
 
     public void drive() {
-        // tankDrive.arcadeDrive(-JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getX() * this.speed,
-        //         JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getY() * this.speed, true);
+        // Getting the steer values from the joystick and the steering wheel
+        double steer = JoystickHandler.getInstance().getJoystick(Joysticks.SteeringWheel).getX() * 2;
+        double velocity = driveFilter.calculate(JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getY()) * speed;
 
-        double speed =  JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getY();
-        tankDrive.arcadeDrive(JoystickHandler.getInstance().getJoystick(Joysticks.SteeringWheel).getX() * speed,
-            speed * Constants.Speeds.normal);
+        // Getting the sign of velocity and steer
+        double velocitySign = Math.signum(velocity);
+        double steerSign = Math.signum(steer);
+
+        // Squaring the velocity, keeping it's sign
+        velocity = Math.pow(velocity, 2) * velocitySign;
+
+        // Calculating the mapped steer and velocity values
+        double mappedSteer = Math.min(Math.abs(steer), 1) * velocity * steerSign;
+        double mappedVelocity = Math.min(Math.abs(Math.abs(velocity) + Math.abs(velocity) * Math.min(0, 1 - Math.abs(steer))), Math.abs(velocity)) * velocitySign;
+
+        // Driving with those values
+        tankDrive.arcadeDrive(mappedSteer,
+            mappedVelocity, false);
     }
 
     public void setSpeed(double maxSpeed) {
