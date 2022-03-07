@@ -47,18 +47,20 @@ public class Drive extends DriveBase {
 
         public static final int filterSamples = 20;
 
-        public static final double wheelPerimeter = 321.6;
-        public static final double transmission = 6.5625;
-        public static final int encoderResolution = 2048;
+        public static final class Odometry {
+            public static final double wheelPerimeter = 321.6;
+            public static final double transmission = 6.5625;
+            public static final int encoderResolution = 2048;
 
-        public static final double encoderToMetersConversion = (1000 / wheelPerimeter) * transmission
-                * encoderResolution;
-        public static final double trackWidthMeters = 0.5;
+            public static final double encoderToMetersConversion = (1000 / wheelPerimeter) * transmission
+                    * encoderResolution;
+            public static final double trackWidthMeters = 0.58;
+        }
 
         public static final class PathWeaver {
-            public static final double ksMeters = 0.12;
-            public static final double kvMetersPerSecoond = 2.89;
-            public static final double ka = 0.45;
+            public static final double ksMeters = 0.72105;
+            public static final double kvMetersPerSecoond = 2.1639;
+            public static final double ka = 0.21993;
 
             public static final double kMaxSpeed = 1.5;
             public static final double kMaxAcceleration = 0.7;
@@ -67,7 +69,7 @@ public class Drive extends DriveBase {
             public static final double kRamseteB = 2;
             public static final double kRamseteZeta = 0.7;
 
-            public static final double kP = 0.035271;
+            public static final double kP = 2.7;
             public static final double kI = 0;
             public static final double kD = 0;
         }
@@ -190,14 +192,14 @@ public class Drive extends DriveBase {
 
         odometry = new DifferentialDriveOdometry(new Rotation2d(0),
                 new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
-        kinematics = new DifferentialDriveKinematics(Constants.trackWidthMeters);
+        kinematics = new DifferentialDriveKinematics(Constants.Odometry.trackWidthMeters);
 
         configMotors();
         tankDrive = new DifferentialDrive(motors.left, motors.right);
 
         odometry = new DifferentialDriveOdometry(new Rotation2d(0),
                 new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
-        kinematics = new DifferentialDriveKinematics(Constants.trackWidthMeters);
+        kinematics = new DifferentialDriveKinematics(Constants.Odometry.trackWidthMeters);
 
         resetSensors();
 
@@ -254,17 +256,17 @@ public class Drive extends DriveBase {
     }
 
     private double getLeftWheelDistance() {
-        return motors.left.getEncoderTicks() / Constants.encoderToMetersConversion;
+        return -motors.left.getEncoderTicks() / Constants.Odometry.encoderToMetersConversion;
     }
 
     private double getRightWheelDistance() {
-        return -motors.right.getEncoderTicks() / Constants.encoderToMetersConversion;
+        return motors.right.getEncoderTicks() / Constants.Odometry.encoderToMetersConversion;
     }
 
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
         return new DifferentialDriveWheelSpeeds(
-                motors.left.getEncoderVelocity() / (60 * Constants.encoderToMetersConversion),
-                -motors.right.getEncoderVelocity() / (60 * Constants.encoderToMetersConversion));
+                -motors.left.getEncoderVelocity() * 10 / (Constants.Odometry.encoderToMetersConversion),
+                motors.right.getEncoderVelocity() * 10 / (Constants.Odometry.encoderToMetersConversion));
     }
 
     public Pose2d getPosition() {
@@ -383,11 +385,12 @@ public class Drive extends DriveBase {
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.addStringProperty("OdometryPoseX", () -> getPosition().toString(), null);
-        builder.addStringProperty("LeftDist", () -> getWheelSpeeds().toString(), null);
         builder.addDoubleProperty("Angle", () -> Navx.getInstance().getAngle(), null);
         builder.addDoubleProperty("ANGLE_ODOMETRY", () -> getPosition().getRotation().getDegrees(), null);
-        builder.addDoubleProperty("rightSpeed", () -> getWheelSpeeds().rightMetersPerSecond, null);
-        builder.addDoubleProperty("leftSpeed", () -> getWheelSpeeds().leftMetersPerSecond, null);
+        builder.addDoubleProperty("rightSpeedmeterspersecond", () -> getWheelSpeeds().rightMetersPerSecond, null);
+        builder.addDoubleProperty("leftSpeedmeterspersecond", () -> getWheelSpeeds().leftMetersPerSecond, null);
+        builder.addDoubleProperty("leftSpeed", () -> motors.left.getEncoderVelocity(), null);
+        builder.addDoubleProperty("rightSpeed", () -> motors.right.getEncoderVelocity(), null);
         super.initSendable(builder);
     }
 }

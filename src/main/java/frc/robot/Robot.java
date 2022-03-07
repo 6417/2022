@@ -56,7 +56,8 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         Navx.getInstance().reset();
 
-        String trajectoryJSON = "paths/output/TrajectoryRecording.wpilib.json";
+        String trajectoryJSON = "paths/output/straight.wpilib.json";
+        // String trajectoryJSON = "paths/output/GeradeAus3m.wpilib.json";
 
         Trajectory pathWeavertest = PathviewerLoader.loadTrajectory(trajectoryJSON);
 

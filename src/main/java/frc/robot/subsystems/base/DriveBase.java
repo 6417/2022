@@ -20,7 +20,7 @@ public class DriveBase extends Module {
     }
 
     public DifferentialDriveKinematics getDriveKinematics() {
-        return new DifferentialDriveKinematics(Drive.Constants.trackWidthMeters);
+        return new DifferentialDriveKinematics(Drive.Constants.Odometry.trackWidthMeters);
     }
 
     public DifferentialDriveVoltageConstraint getVoltageConstrain() {
