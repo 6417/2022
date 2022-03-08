@@ -54,4 +54,16 @@ public class TelescopeArmBase extends Module {
     public boolean isAtTarget() {
        return true;
     }
+
+    public void stopMotors() {
+
+    }
+
+    public void stopLeftMotor() {
+
+    }
+
+    public void stopRightMotor() {
+
+    }
 }

@@ -29,14 +29,11 @@ public class TilterHook extends Module {
             }
         }
 
-        public final Side right;
-        public final Side left;
+        public final int solenoid = 0;
 
         public Params(int id, boolean direction, Side right, Side left) {
             this.id = id;
             this.direction = direction;
-            this.right = right;
-            this.left = left;
         }
     }
 
@@ -52,8 +49,6 @@ public class TilterHook extends Module {
         requires(PneumaticHandler.getInstance());
         solenoid = new FridoSolenoid(params.id);
         this.params = params;
-        right = params.right;
-        left = params.left;
         state = Hookstate.locked;
         requires(solenoid);
     }
@@ -61,15 +56,17 @@ public class TilterHook extends Module {
     @Override
     public void init() {
         super.init();
+        solenoid.init();
     }
 
     public void lockHook() {
-        if (isLockable()) {
-            solenoid.set(!params.direction);
-            state = Hookstate.locked;
-        } else
-            DriverStation.reportWarning("hock was not locked", false);
+//        if (isLockable()) {
+//            solenoid.set(!params.direction);
+//            state = Hookstate.locked;
+//        } else
+//            DriverStation.reportWarning("hock was not locked", false);
 
+        solenoid.set(!params.direction);
     }
 
     public void openHook() {
@@ -97,12 +94,12 @@ public class TilterHook extends Module {
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
-        builder.addBooleanProperty("right pipe in hook switch", right.pipeInHookSwitch::get, null);
-        builder.addBooleanProperty("left pipe in hook switch", left.pipeInHookSwitch::get, null);
+//        builder.addBooleanProperty("right pipe in hook switch", right.pipeInHookSwitch::get, null);
+//        builder.addBooleanProperty("left pipe in hook switch", left.pipeInHookSwitch::get, null);
+//
+//        builder.addBooleanProperty("right is lockable switch", right.pipeInHookSwitch::get, null);
+//        builder.addBooleanProperty("left is lockable switch", left.pipeInHookSwitch::get, null);
 
-        builder.addBooleanProperty("right is lockable switch", right.pipeInHookSwitch::get, null);
-        builder.addBooleanProperty("left is lockable switch", left.pipeInHookSwitch::get, null);
-
-        builder.addBooleanProperty("solenoid state", solenoid::get, null);
+//        builder.addBooleanProperty("solenoid state", () -> isInitialized() ? solenoid.get() : false, null);
     }
 }

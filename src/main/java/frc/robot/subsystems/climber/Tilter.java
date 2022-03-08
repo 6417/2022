@@ -18,6 +18,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.Vector2d;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.Joysticks;
@@ -36,9 +37,9 @@ public class Tilter extends TilterBase {
             public static final double traversalpreparationPoint = 0;
         }
 
-        public static final int motorId = 0;
-        public static final FridolinsMotor.LimitSwitchPolarity forwardLimitSwitchPolarity = FridolinsMotor.LimitSwitchPolarity.kDisabled;
-        public static final FridolinsMotor.LimitSwitchPolarity reverseLimitSwitchPolarity = FridolinsMotor.LimitSwitchPolarity.kDisabled;
+        public static final int motorId = 20;
+        public static final FridolinsMotor.LimitSwitchPolarity forwardLimitSwitchPolarity = FridolinsMotor.LimitSwitchPolarity.kNormallyClosed;
+        public static final FridolinsMotor.LimitSwitchPolarity reverseLimitSwitchPolarity = FridolinsMotor.LimitSwitchPolarity.kNormallyClosed;
 
         public static final double zeroingSpeed = 0.0;
 
@@ -70,13 +71,25 @@ public class Tilter extends TilterBase {
     public void init() {
         super.init();
 
-        motor = new FridoCanSparkMax(Constants.motorId, CANSparkMaxLowLevel.MotorType.kBrushed);
+        hook.init();
+
+        motor = new FridoCanSparkMax(Constants.motorId, CANSparkMaxLowLevel.MotorType.kBrushless);
+        motor.factoryDefault();
 
         motor.configEncoder(FridolinsMotor.FridoFeedBackDevice.kBuildin, 1);
         motor.setPID(Constants.pid);
 
         motor.enableForwardLimitSwitch(Constants.forwardLimitSwitchPolarity, true);
         motor.enableReverseLimitSwitch(Constants.reverseLimitSwitchPolarity, true);
+    }
+
+    @Override
+    public void periodic() {
+        if (isInitialized()) {
+            if (motor.isForwardLimitSwitchActive()) {
+                motor.setEncoderPosition(0);
+            }
+        }
     }
 
     @Override
@@ -129,7 +142,7 @@ public class Tilter extends TilterBase {
         this.hook.openHook();
     }
 
-    private Optional<Double> targetPos;
+    private Optional<Double> targetPos = Optional.empty();
 
     @Override
     public void setPosition(double ticks) {
@@ -165,8 +178,42 @@ public class Tilter extends TilterBase {
     @Override
     public List<Binding> getMappings() {
         return List.of(
-                new Binding(Joysticks.Drive, () -> 5, Button::whenPressed, new InstantCommand(this::openHooks)),
-                new Binding(Joysticks.Drive, () -> 3, Button::whenPressed, new InstantCommand(this::closeHooks))
+//                new Binding(Joysticks.Drive, () -> 5, Button::whenPressed, new InstantCommand(this::openHooks)),
+//                new Binding(Joysticks.Drive, () -> 3, Button::whenPressed, new InstantCommand(this::closeHooks))
+                new Binding(Joysticks.Drive, () -> 4, Button::whileHeld, new CommandBase() {
+                    @Override
+                    public void initialize() {
+                        motor.set(0.3);
+                    }
+
+                    @Override
+                    public void end(boolean interrupted) {
+                        motor.stopMotor();
+                    }
+                }),
+        new Binding(Joysticks.Drive, () -> 2, Button::whileHeld, new CommandBase() {
+            @Override
+            public void initialize() {
+                motor.set(-0.3);
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                motor.stopMotor();
+            }
+        }),
+
+        new Binding(Joysticks.Drive, () -> 8, Button::toggleWhenPressed, new CommandBase() {
+            @Override
+            public void initialize() {
+                hook.openHook();
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                hook.lockHook();
+            }
+        })
         );
     }
 
