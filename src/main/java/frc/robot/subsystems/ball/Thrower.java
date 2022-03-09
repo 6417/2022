@@ -99,6 +99,16 @@ public class Thrower extends ThrowerBase {
     }
 
     @Override
+    public void blockMotor() {
+        motor.setIdleMode(IdleMode.kBrake);
+    }
+
+    @Override
+    public void unlockMotor() {
+        motor.setIdleMode(IdleMode.kCoast);
+    }
+
+    @Override
     public void setPercentage(double percentage) {
         motor.set(percentage);
     }

@@ -28,6 +28,14 @@ public class ThrowerBase extends Module {
         return false;
     }
 
+    public void blockMotor() {
+
+    }
+
+    public void unlockMotor() {
+
+    }
+
     public boolean isAtTarget() {
         return false;
     }

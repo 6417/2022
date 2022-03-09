@@ -12,7 +12,9 @@ import frc.robot.subsystems.ball.Transport;
 
 public class ShootCommand extends SequentialCommandGroup {
     public ShootCommand() {
+        System.out.println("Created shootCommand");
         addCommands(
+                    new InstantCommand(() -> Thrower.getInstance().unlockMotor()),
                     new InstantCommand(() -> Thrower.getInstance().setPercentage(0.2)),
                     new WaitCommand(0.2),
                     new PullbackBallsCommand(),

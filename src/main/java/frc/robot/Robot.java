@@ -63,8 +63,8 @@ public class Robot extends TimedRobot {
 
         m_autonomousCommand = RamseteCommandGenerator.generateRamseteCommand(pathWeavertest);
 
-        Drive.getInstance().setDirectionToReverse();
-        // Drive.getInstance().setDirectionToForward();
+        // Drive.getInstance().setDirectionToReverse();
+        Drive.getInstance().setDirectionToForward();
 
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
