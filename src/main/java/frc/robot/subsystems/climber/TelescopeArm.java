@@ -406,6 +406,7 @@ public class TelescopeArm extends TelescopeArmBase {
     public List<Binding> getMappings() {
         return List.of(
                 new Binding(Joysticks.Drive, () -> 3, Button::whenPressed, new InstantCommand(this::resetEncoders)),
+                // Climb up
                 new Binding(Joysticks.Drive, () -> 9, Button::whileHeld, new CommandBase() {
                     {
                         addRequirements(TelescopeArm.this);
@@ -421,6 +422,8 @@ public class TelescopeArm extends TelescopeArmBase {
                         stopMotors();
                     }
                 }),
+
+                // Go to Ground
                 new Binding(Joysticks.Drive, () -> 10, Button::whileHeld, new CommandBase() {
                     {
                         addRequirements(TelescopeArm.this);
@@ -436,6 +439,8 @@ public class TelescopeArm extends TelescopeArmBase {
                         stopMotors();
                     }
                 }),
+
+                // Go over first wrung
                 new Binding(Joysticks.Drive, () -> 1, Button::whileHeld, new CommandBase() {
                     {
                         addRequirements(TelescopeArm.this);
@@ -452,6 +457,24 @@ public class TelescopeArm extends TelescopeArmBase {
                     }
                 }),
 
+                // Touch wrung
+                new Binding(Joysticks.Drive, () -> 5, Button::whileHeld, new CommandBase() {
+                    {
+                        addRequirements(TelescopeArm.this);
+                    }
+
+                    @Override
+                    public void initialize() {
+                        gotoPos(135);
+                    }
+
+                    @Override
+                    public void end(boolean interrupted) {
+                        stopMotors();
+                    }
+                }),
+
+                // go slowly down
                 new Binding(Joysticks.Drive, () -> 7, Button::whileHeld, new CommandBase() {
                     {
                         addRequirements(TelescopeArm.this);

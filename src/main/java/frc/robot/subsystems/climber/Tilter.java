@@ -178,8 +178,7 @@ public class Tilter extends TilterBase {
     @Override
     public List<Binding> getMappings() {
         return List.of(
-//                new Binding(Joysticks.Drive, () -> 5, Button::whenPressed, new InstantCommand(this::openHooks)),
-//                new Binding(Joysticks.Drive, () -> 3, Button::whenPressed, new InstantCommand(this::closeHooks))
+                new Binding(Joysticks.Drive, () -> 6, Button::whenPressed, new InstantCommand(this::resetEncoder)),
                 new Binding(Joysticks.Drive, () -> 4, Button::whileHeld, new CommandBase() {
                     @Override
                     public void initialize() {
