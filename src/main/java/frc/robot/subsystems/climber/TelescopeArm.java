@@ -36,7 +36,7 @@ import static java.lang.Math.abs;
 
 public class TelescopeArm extends TelescopeArmBase {
     private static TelescopeArmBase instance = null;
-    private static final boolean enabled = true;
+    private static final boolean enabled = false;
 
     public static final class Constants {
         public static final FridolinsMotor.LimitSwitchPolarity limitSwitchPolarity = FridolinsMotor.LimitSwitchPolarity.kNormallyClosed;
