@@ -14,7 +14,7 @@ public class CheckTraversalWrungContact extends Command{
 
     @Override
     public void initialize() {
-        TelescopeArm.getInstance().gotoCheckFristWrung();
+        TelescopeArm.getInstance().gotoCheckTraversalWrung();
     }
 
     @Override

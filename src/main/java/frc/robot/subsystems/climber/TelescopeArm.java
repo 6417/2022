@@ -65,17 +65,17 @@ public class TelescopeArm extends TelescopeArmBase {
 
         public static final class Heights {
             public static final double firstWrung = 145;
-            public static final double checkFirst = 0;
-            public static final double traversalPreparationHeight = 0;
-            public static final double traversalHeight = 0;
-            public static final double extended = 0;
+            public static final double checkFirst = 135;
+            public static final double traversalPreparationHeight = 100;
+            public static final double traversalHeight = 125;
+            public static final double traversalCheck = 115;
             public static final double handover = 0;
         }
 
         public static final class MayExceeded {
-            public static final double limit = 145;
+            public static final double limit = 147;
             public static final double softMax = 145;
-            public static final double speed = -0.1;
+            public static final double speed = -0.05;
         }
     }
 
@@ -503,11 +503,19 @@ public class TelescopeArm extends TelescopeArmBase {
                     public void end(boolean interrupted) {
                         stopMotors();
                     }
+
+                    @Override
+                    public boolean isFinished() {
+                        return getBottomLimitSwitchLeft() && getBottomLimitSwitchRight();
+                    }
                 })
         );
     }
 
-    private double zeroWhenHanging = 0.0;
+    @Override
+    public void gotoCheckTraversalWrung() {
+        gotoPos(Constants.Heights.traversalCheck);
+    }
 
     @Override
     public void initSendable(SendableBuilder builder) {

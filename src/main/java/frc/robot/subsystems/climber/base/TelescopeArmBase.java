@@ -66,4 +66,8 @@ public class TelescopeArmBase extends Module {
     public void stopRightMotor() {
 
     }
+
+    public void gotoCheckTraversalWrung() {
+
+    }
 }

@@ -33,8 +33,8 @@ public class Tilter extends TilterBase {
     public static final class Constants {
         public class Positions {
             public static final double handoverPosition = 0;
-            public static final double traversalPosition = 0;
-            public static final double traversalpreparationPoint = 0;
+            public static final double traversalPosition = -222;
+            public static final double traversalpreparationPoint = -247;
         }
 
         public static final int motorId = 20;
