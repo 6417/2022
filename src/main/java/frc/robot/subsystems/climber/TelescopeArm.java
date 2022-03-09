@@ -20,6 +20,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -224,7 +225,9 @@ public class TelescopeArm extends TelescopeArmBase {
 
         public void updateTarget(double target) {
             this.target = Optional.of(target);
+            climberPid.setSetpoint(target);
         }
+
 
         @Override
         public void initialize() {
@@ -236,6 +239,7 @@ public class TelescopeArm extends TelescopeArmBase {
 
         @Override
         public void execute() {
+            System.out.println("target = " + target);
             double out = climberPid.calculate(
                     (motors.left.getEncoderTicks() + motors.right.getEncoderTicks()) / 2);
             double errCorr = climberErrorPid.calculate(motors.right.getEncoderTicks() - motors.left.getEncoderTicks());
@@ -409,7 +413,7 @@ public class TelescopeArm extends TelescopeArmBase {
 
                     @Override
                     public void initialize() {
-                        gotoPosClimbing(-0.6);
+                        gotoPosClimbing(0);
                     }
 
                     @Override
@@ -448,28 +452,35 @@ public class TelescopeArm extends TelescopeArmBase {
                     }
                 }),
 
-        new Binding(Joysticks.Drive, () -> 8, Button::whileHeld, new CommandBase() {
-            {
-                addRequirements(TelescopeArm.this);
-            }
+                new Binding(Joysticks.Drive, () -> 7, Button::whileHeld, new CommandBase() {
+                    {
+                        addRequirements(TelescopeArm.this);
+                    }
 
+                    private double setPoint = 0;
+                    private Timer timer = new Timer();
 
+                    @Override
+                    public void initialize() {
+                        setPoint = (motors.right.getEncoderTicks() + motors.left.getEncoderTicks()) / 2;
+                        gotoPosClimbing(setPoint);
+                        timer.reset();
+                        timer.start();
+                    }
 
-            @Override
-            public void initialize() {
+                    @Override
+                    public void execute() {
+                        setPoint -= timer.get() * 3;
+                        gotoPosClimbingCommand.updateTarget(setPoint);
+                        timer.reset();
+                        timer.start();
+                    }
 
-            }
-
-            @Override
-            public void execute() {
-                super.execute();
-            }
-
-            @Override
-            public void end(boolean interrupted) {
-                stopMotors();
-            }
-        })
+                    @Override
+                    public void end(boolean interrupted) {
+                        stopMotors();
+                    }
+                })
         );
     }
 
