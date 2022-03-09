@@ -69,6 +69,8 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
     implementation files('src/lib/FridoWPI/build/libs/FridoWPI.jar')
+
+    implementation group: 'org.jeasy', name: 'easy-states', version: '2.0.0'
 }
 
 // Simulation configuration (e.g. environment variables).
@@ -80,6 +82,7 @@ wpi.sim.addDriverstation()
 // knows where to look for our Robot Class.
 
 compileJava {
+    dependsOn gradle.includedBuild("FridoWPI").task(":compileJava")
     dependsOn gradle.includedBuild("FridoWPI").task(":jar")
     compileJava
 }
