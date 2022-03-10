@@ -76,4 +76,8 @@ public class TelescopeArmBase extends Module {
     public void gotoRelease2Position() {
         
     }
+
+    public void goDownSlowly() {
+
+    }
 }

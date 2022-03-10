@@ -7,6 +7,7 @@ import org.jeasy.states.api.EventHandler;
 import frc.robot.commands.climber.BeginTraversing;
 import frc.robot.commands.climber.MoveToFirstWrungPosition;
 import frc.robot.commands.climber.PrepareTraverse;
+import frc.robot.commands.climber.Pull;
 import frc.robot.commands.climber.FinishTraverse;
 import frc.robot.commands.telescopeArm.CheckFirstWrungContact;
 import frc.robot.commands.telescopeArm.MoveArmToFirstwrungPosition;
@@ -45,7 +46,7 @@ public class EventHandlers {
     public static class Pull implements EventHandler<Events.CheckPassed> {
         @Override
         public void handleEvent(Events.CheckPassed arg0) throws Exception {
-            CommandScheduler.getInstance().schedule(new RetractTelescopearm());
+            CommandScheduler.getInstance().schedule(new frc.robot.commands.climber.Pull());
             System.out.println("pulling");
         }
     }
