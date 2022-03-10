@@ -53,4 +53,10 @@ public class TilterBase extends Module {
 
     public void setVelocity(double vel) {
     }
+    public void gotoRelease1Position(){
+
+    }
+    public void gotoRelease2Position(){
+        
+    }
 }
