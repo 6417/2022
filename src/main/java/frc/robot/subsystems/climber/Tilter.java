@@ -35,6 +35,8 @@ public class Tilter extends TilterBase {
             public static final double handoverPosition = 0;
             public static final double traversalPosition = -222;
             public static final double traversalpreparationPoint = -247;
+            public static final double release1Position = 0;
+            public static final double release2Position = 0;
         }
 
         public static final int motorId = 20;
@@ -110,6 +112,15 @@ public class Tilter extends TilterBase {
     @Override
     public void gotoTraversalPoint() {
         motor.setPosition(Constants.Positions.traversalPosition);
+    }
+    @Override
+    public void gotoRelease1Position() {
+        motor.setPosition(Constants.Positions.release1Position);
+    }
+    
+    @Override
+    public void gotoRelease2Position() {
+        motor.setPosition(Constants.Positions.release2Position);
     }
 
     @Override

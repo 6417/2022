@@ -11,7 +11,7 @@ import frc.robot.statemachines.Events;
 public class PrepareTraverse extends ParallelCommandGroup {
     public PrepareTraverse() {
         addCommands(
-                new ExtendWhileOnWrung(),
+                new ReleaseWrungToTilter(),
                 new MoveArmToPreparetraversalPosition(),
                 new MoveTilterToTraversalpreparationPoint()
         );

@@ -70,4 +70,14 @@ public class TelescopeArmBase extends Module {
     public void gotoCheckTraversalWrung() {
 
     }
+    public void gotoRelease1Position() {
+
+    }
+    public void gotoRelease2Position() {
+        
+    }
+
+    public void goDownSlowly() {
+
+    }
 }

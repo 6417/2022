@@ -70,6 +70,8 @@ public class TelescopeArm extends TelescopeArmBase {
             public static final double traversalHeight = 125;
             public static final double traversalCheck = 115;
             public static final double handover = 0;
+            public static final double release1Position = 0;
+            public static final double release2Position = 0;
         }
 
         public static final class MayExceeded {
@@ -313,6 +315,16 @@ public class TelescopeArm extends TelescopeArmBase {
     public void gotoHandover() {
         gotoPos(Constants.Heights.handover);
     }
+
+    @Override
+    public void gotoRelease1Position() {
+        gotoPos(Constants.Heights.release1Position);
+    }
+    @Override
+    public void gotoRelease2Position() {
+        gotoPos(Constants.Heights.release2Position);
+    }
+    
 
     @Override
     public void resetEncoders() {

@@ -6,27 +6,18 @@ import frc.robot.statemachines.Events;
 import frc.robot.subsystems.climber.TelescopeArm;
 
 public class CheckTraversalWrungContact extends Command{
-    boolean alreadyFired;
-
-    public CheckTraversalWrungContact() {
-        alreadyFired = false;
-    }
-
     @Override
     public void initialize() {
         TelescopeArm.getInstance().gotoCheckTraversalWrung();
     }
 
     @Override
-    public void execute() {
-        if (TelescopeArm.getInstance().hasWrungContact() && !alreadyFired) {
-            ClimberStatemachine.getInstance().fireEvent(new Events.traverseCheckSuccessful());
-            alreadyFired = true;
-        }
-    }
-
-    @Override
     public void end(boolean interrupted) {
+        if (TelescopeArm.getInstance().hasWrungContact()) {
+            ClimberStatemachine.getInstance().fireEvent(new Events.traverseCheckSuccessful());
+            return;
+        }
+        
         ClimberStatemachine.getInstance().fireEvent(new Events.finishedCheckingTraversal());
     }
 
