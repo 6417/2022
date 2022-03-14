@@ -1,5 +1,6 @@
 package frc.robot.subsystems.climber;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,9 +36,12 @@ public class TelescopeArm extends TelescopeArmBase {
 
     public static final class Constants {
         public static final FridolinsMotor.LimitSwitchPolarity limitSwitchPolarity = FridolinsMotor.LimitSwitchPolarity.kNormallyClosed;
-        public static final double zeroSpeed = -0.05;
+        public static final double zeroSpeed = 6;
+        public static final double zeroMotorSpeed = -0.1;
 
-        public static final double climbingSpeed = 48; // encoder units per second
+        public static final double climbingSpeed = 32; // encoder units per second
+        public static final double slowClimbingSpeed = 3; // encoder units per second
+        public static final double extendSpeed = 48; // encoder units per second
 
         public static final boolean rightInverted = true;
         public static final boolean leftInverted = false;
@@ -284,9 +288,11 @@ public class TelescopeArm extends TelescopeArmBase {
         SlewRateLimiter limiter = new SlewRateLimiter(Constants.climbingSpeed);
 
         Optional<Double> target = Optional.empty();
+        double speed = 0;
 
-        public void updateTarget(double target) {
+        public void updateTarget(double target, double speed) {
             this.target = Optional.of(target);
+            this.speed = speed;
         }
 
         @Override
@@ -294,6 +300,7 @@ public class TelescopeArm extends TelescopeArmBase {
             super.initialize();
             if (target.isEmpty())
                 return;
+            limiter = new SlewRateLimiter(speed);
             limiter.reset((motors.right.getEncoderTicks() + motors.left.getEncoderTicks()) / 2);
             CommandScheduler.getInstance().schedule(gotoPosClimbingCommandNoVelLimit);
         }
@@ -324,7 +331,7 @@ public class TelescopeArm extends TelescopeArmBase {
     }
 
     private void gotoPosClimbing(double pos) {
-        gotoPosClimbingCommand.updateTarget(pos);
+        gotoPosClimbingCommand.updateTarget(pos, Constants.climbingSpeed);
         CommandScheduler.getInstance().schedule(gotoPosClimbingCommand);
     }
 
@@ -391,6 +398,7 @@ public class TelescopeArm extends TelescopeArmBase {
 
     @Override
     public void startZero() {
+        gotoPosClimbingCommand.updateTarget(-100000, Constants.zeroSpeed);
         motors.left.set(Constants.zeroSpeed);
         motors.right.set(Constants.zeroSpeed);
     }
@@ -438,40 +446,32 @@ public class TelescopeArm extends TelescopeArmBase {
         motors.right.stopMotor();
     }
 
-    CommandBase goDownSlowlyCommand = new CommandBase() {
-        {
-            addRequirements(TelescopeArm.this);
-        }
-
-        SlewRateLimiter limiter = new SlewRateLimiter(3);
-
-
-        @Override
-        public void initialize() {
-            super.initialize();
-            limiter.reset((motors.right.getEncoderTicks() + motors.left.getEncoderTicks()) / 2);
-            CommandScheduler.getInstance().schedule(gotoPosClimbingCommandNoVelLimit);
-        }
-
-        @Override
-        public void execute() {
-            double currentTarget = limiter.calculate(-10000);
-            gotoPosClimbingCommandNoVelLimit.updateTarget(currentTarget);
-            CommandScheduler.getInstance().schedule(gotoPosClimbingCommandNoVelLimit);
-            super.execute();
-        }
-    };
-
     @Override
     public void goDownSlowly() {
-        CommandScheduler.getInstance().schedule(goDownSlowlyCommand);
+        gotoPosClimbingCommand.updateTarget(-10000, Constants.slowClimbingSpeed);
+        CommandScheduler.getInstance().schedule(gotoPosClimbingCommand);
+    }
+
+    @Override
+    public void goUpSlowly() {
+        gotoPosClimbingCommand.updateTarget(10000, Constants.slowClimbingSpeed);
+        CommandScheduler.getInstance().schedule(gotoPosClimbingCommand);
+    }
+
+    @Override
+    public void setMotorLeft(double speed) {
+        motors.left.set(speed);
+    }
+
+    @Override
+    public void setMotorRight(double speed) {
+        motors.right.set(speed);
     }
 
     @Override
     public void stopMotors() {
         CommandScheduler.getInstance().cancel(gotoPosClimbingCommandNoVelLimit);
         CommandScheduler.getInstance().cancel(gotoPosClimbingCommand);
-        CommandScheduler.getInstance().cancel(goDownSlowlyCommand);
         stopLeftMotor();
         stopRightMotor();
     }
