@@ -8,7 +8,6 @@ import ch.fridolins.fridowpi.pneumatics.PneumaticHandler;
 import ch.fridolins.fridowpi.utils.LatchedBoolean;
 import ch.fridolins.fridowpi.utils.LatchedBooleanFalling;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DriverStation;
 
 public class TilterHook extends Module {
     public enum Hookstate {
@@ -21,11 +20,11 @@ public class TilterHook extends Module {
 
         static final class Side {
             public final LimitSwitch lockableSwitch;
-            public final LimitSwitch pipeInHookSwitch;
+            public final LimitSwitch wrungContactSwitch;
 
             public Side(LimitSwitch lockableSwitch, LimitSwitch pipeInHookSwitch) {
                 this.lockableSwitch = lockableSwitch;
-                this.pipeInHookSwitch = pipeInHookSwitch;
+                this.wrungContactSwitch = pipeInHookSwitch;
             }
         }
 
@@ -75,7 +74,7 @@ public class TilterHook extends Module {
     }
 
     public boolean isWrungInHook() {
-        return right.pipeInHookSwitch.get() && left.pipeInHookSwitch.get();
+        return right.wrungContactSwitch.get() && left.wrungContactSwitch.get();
     }
 
     LatchedBoolean lockableLatchedBoolean = new LatchedBooleanFalling(false);
@@ -94,12 +93,9 @@ public class TilterHook extends Module {
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
-//        builder.addBooleanProperty("right pipe in hook switch", right.pipeInHookSwitch::get, null);
-//        builder.addBooleanProperty("left pipe in hook switch", left.pipeInHookSwitch::get, null);
-//
-//        builder.addBooleanProperty("right is lockable switch", right.pipeInHookSwitch::get, null);
-//        builder.addBooleanProperty("left is lockable switch", left.pipeInHookSwitch::get, null);
-
-//        builder.addBooleanProperty("solenoid state", () -> isInitialized() ? solenoid.get() : false, null);
+//        builder.addBooleanProperty("lockable right", () -> isInitialized() ? right.lockableSwitch.get() : false, null);
+//        builder.addBooleanProperty("lockable left", () -> isInitialized() ? left.lockableSwitch.get(): false, null);
+//        builder.addBooleanProperty("wrung right", () -> isInitialized() ? right.wrungContactSwitch.get() : false, null);
+//        builder.addBooleanProperty("wrung left", () -> isInitialized() ? left.wrungContactSwitch.get(): false, null);
     }
 }

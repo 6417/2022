@@ -15,9 +15,11 @@ import ch.fridolins.fridowpi.motors.utils.PidValues;
 import ch.fridolins.fridowpi.sensors.Navx;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.Vector2d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
@@ -27,7 +29,7 @@ import frc.robot.subsystems.climber.base.TilterBase;
 
 public class Tilter extends TilterBase {
     private static TilterBase instance = null;
-    private static final boolean enabled = false;
+    private static final boolean enabled = true;
 
 
     public static final class Constants {
@@ -55,7 +57,7 @@ public class Tilter extends TilterBase {
         public static final PidValues pid = new PidValues(2.0, 0.0, 0.8);
 
         static {
-            pid.setTolerance(0.0);
+            pid.setTolerance(0.1);
         }
     }
 
@@ -65,6 +67,7 @@ public class Tilter extends TilterBase {
     private Tilter() {
         hook = new TilterHook(Constants.hookParams);
         requires(hook);
+        addChild("Hooks", hook);
         Initializer.getInstance().addInitialisable(this);
         JoystickHandler.getInstance().bind(this);
     }
@@ -189,8 +192,8 @@ public class Tilter extends TilterBase {
     @Override
     public List<Binding> getMappings() {
         return List.of(
-                new Binding(Joysticks.Drive, () -> 6, Button::whenPressed, new InstantCommand(this::resetEncoder)),
-                new Binding(Joysticks.Drive, () -> 4, Button::whileHeld, new CommandBase() {
+                new Binding(Joysticks.Climb, () -> 6, Button::whenPressed, new InstantCommand(this::resetEncoder)),
+                new Binding(Joysticks.Climb, () -> 4, Button::whileHeld, new CommandBase() {
                     @Override
                     public void initialize() {
                         motor.set(0.3);
@@ -201,7 +204,7 @@ public class Tilter extends TilterBase {
                         motor.stopMotor();
                     }
                 }),
-        new Binding(Joysticks.Drive, () -> 2, Button::whileHeld, new CommandBase() {
+        new Binding(Joysticks.Climb, () -> 2, Button::whileHeld, new CommandBase() {
             @Override
             public void initialize() {
                 motor.set(-0.3);
@@ -213,7 +216,7 @@ public class Tilter extends TilterBase {
             }
         }),
 
-        new Binding(Joysticks.Drive, () -> 8, Button::toggleWhenPressed, new CommandBase() {
+        new Binding(Joysticks.Climb, () -> 8, Button::toggleWhenPressed, new CommandBase() {
             @Override
             public void initialize() {
                 hook.openHook();

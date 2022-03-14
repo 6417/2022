@@ -55,6 +55,10 @@ public class TelescopeArmBase extends Module {
        return true;
     }
 
+    public void goDownSlowly() {
+
+    }
+
     public void stopMotors() {
 
     }
@@ -75,9 +79,5 @@ public class TelescopeArmBase extends Module {
     }
     public void gotoRelease2Position() {
         
-    }
-
-    public void goDownSlowly() {
-
     }
 }

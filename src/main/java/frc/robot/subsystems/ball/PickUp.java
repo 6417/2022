@@ -88,7 +88,7 @@ public class PickUp extends PickUpBase {
 
     private Motors motors = new Motors();
     private static PickUpBase instance = null;
-    private static boolean enabled = true;
+    private static final boolean enabled = false;
 
     @Override
     public void init() {

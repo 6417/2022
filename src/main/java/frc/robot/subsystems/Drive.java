@@ -35,8 +35,7 @@ import frc.robot.commands.SpeedCommand;
 import frc.robot.subsystems.base.DriveBase;
 
 public class Drive extends DriveBase {
-
-    private static final boolean enabled = true;
+    private static final boolean enabled = false;
     private static DriveBase instance = null;
     private LinearFilter driveFilter;
     private int driveDirection = 1;

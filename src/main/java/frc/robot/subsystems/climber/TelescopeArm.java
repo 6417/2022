@@ -2,7 +2,6 @@ package frc.robot.subsystems.climber;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import ch.fridolins.fridowpi.command.Command;
 import ch.fridolins.fridowpi.motors.utils.PidValues;
@@ -15,45 +14,36 @@ import ch.fridolins.fridowpi.joystick.JoystickHandler;
 import ch.fridolins.fridowpi.motors.FridoCanSparkMax;
 import ch.fridolins.fridowpi.motors.FridolinsMotor;
 import ch.fridolins.fridowpi.motors.LimitSwitch;
-import ch.fridolins.fridowpi.pneumatics.FridoSolenoid;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.Joysticks;
-import frc.robot.statemachines.ClimberStatemachine;
-import frc.robot.statemachines.Events;
-import frc.robot.subsystems.climber.Tilter.Constants;
 import frc.robot.subsystems.climber.base.TelescopeArmBase;
 
 import static java.lang.Math.abs;
 
 public class TelescopeArm extends TelescopeArmBase {
     private static TelescopeArmBase instance = null;
-    private static final boolean enabled = false;
+    private static final boolean enabled = true;
 
     public static final class Constants {
         public static final FridolinsMotor.LimitSwitchPolarity limitSwitchPolarity = FridolinsMotor.LimitSwitchPolarity.kNormallyClosed;
         public static final double zeroSpeed = -0.05;
 
+        public static final double climbingSpeed = 48; // encoder units per second
+
         public static final boolean rightInverted = true;
         public static final boolean leftInverted = false;
 
         public static final class PID {
-            public static final PidValues climbingPid = new PidValues(0.12, 0, 0.00112725, -0.045);
-            public static final PidValues expandRetractPid = new PidValues(4e-5, 0, 0, 1.56e-4);
-
-            static {
-                expandRetractPid.cruiseVelocity = Optional.of(5800.0);
-//                expandRetractPid.acceleration = Optional.of(17400.0);
-                expandRetractPid.acceleration = Optional.of(10400.0);
-            }
+            public static final PidValues climbingPid = new PidValues(0.12, 0, 0.00112725);
         }
 
         public static final class Ids {
@@ -61,6 +51,8 @@ public class TelescopeArm extends TelescopeArmBase {
             public static final int rightFollower = 24;
             public static final int left = 21;
             public static final int leftFollower = 23;
+            public static final int wrungContactSwitchDIORight = 9;
+            public static final int wrungContactSwitchDIOLeft = 8;
         }
 
         public static final class Heights {
@@ -106,8 +98,10 @@ public class TelescopeArm extends TelescopeArmBase {
             rightFollower.setInverted(Constants.rightInverted);
             leftFollower.setInverted(Constants.leftInverted);
 
-            right.setPID(Constants.PID.expandRetractPid);
-            left.setPID(Constants.PID.expandRetractPid);
+            ((FridoCanSparkMax) right).setSmartCurrentLimit(30, 20);
+            ((FridoCanSparkMax) rightFollower).setSmartCurrentLimit(30, 20);
+            ((FridoCanSparkMax) left).setSmartCurrentLimit(30, 20);
+            ((FridoCanSparkMax) leftFollower).setSmartCurrentLimit(30, 20);
 
             rightFollower.follow(right, FridolinsMotor.DirectionType.followMaster);
             leftFollower.follow(left, FridolinsMotor.DirectionType.followMaster);
@@ -213,16 +207,20 @@ public class TelescopeArm extends TelescopeArmBase {
     }
 
     private void gotoPos(double pos) {
-        motors.right.setPidTarget(pos, FridolinsMotor.PidType.smartMotion);
-        motors.left.setPidTarget(pos, FridolinsMotor.PidType.smartMotion);
+//        motors.right.setPidTarget(pos, FridolinsMotor.PidType.smartMotion);
+//        motors.left.setPidTarget(pos, FridolinsMotor.PidType.smartMotion);
+
+        gotoPosClimbing(pos);
     }
 
+    GotoPosClimbingNoVelLimit gotoPosClimbingCommandNoVelLimit = new GotoPosClimbingNoVelLimit();
     GotoPosClimbing gotoPosClimbingCommand = new GotoPosClimbing();
+
     double currentErrorCorr = 0;
     double outputRight = 0;
     double outputLeft = 0;
 
-    private class GotoPosClimbing extends Command {
+    private class GotoPosClimbingNoVelLimit extends Command {
         private Optional<Double> target = Optional.empty();
 
         public void updateTarget(double target) {
@@ -268,6 +266,7 @@ public class TelescopeArm extends TelescopeArmBase {
             });
         }
 
+
         @Override
         public void end(boolean interrupted) {
             // DO NOT call stopMotors or you will have infinite recursion
@@ -277,13 +276,51 @@ public class TelescopeArm extends TelescopeArmBase {
 
         @Override
         public boolean isFinished() {
-            return false;
+            return (climberPid.atSetpoint() && climberErrorPid.atSetpoint()) || target.isEmpty();
+        }
+    }
+
+    class GotoPosClimbing extends CommandBase {
+        SlewRateLimiter limiter = new SlewRateLimiter(Constants.climbingSpeed);
+
+        Optional<Double> target = Optional.empty();
+
+        public void updateTarget(double target) {
+            this.target = Optional.of(target);
         }
 
-        //        @Override
-//        public boolean isFinished() {
-//            return (climberPid.atSetpoint() && climberPid.atSetpoint()) || target.isEmpty();
-//        }
+        @Override
+        public void initialize() {
+            super.initialize();
+            if (target.isEmpty())
+                return;
+            limiter.reset((motors.right.getEncoderTicks() + motors.left.getEncoderTicks()) / 2);
+            CommandScheduler.getInstance().schedule(gotoPosClimbingCommandNoVelLimit);
+        }
+
+        @Override
+        public void execute() {
+            if (target.isEmpty())
+                return;
+
+            double currentTarget = limiter.calculate(target.get());
+            gotoPosClimbingCommandNoVelLimit.updateTarget(currentTarget);
+            CommandScheduler.getInstance().schedule(gotoPosClimbingCommandNoVelLimit);
+            super.execute();
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            CommandScheduler.getInstance().cancel(gotoPosClimbingCommandNoVelLimit);
+            System.out.println("goto with vel limit end");
+        }
+
+        @Override
+        public boolean isFinished() {
+            if (target.isEmpty())
+                return true;
+            return (gotoPosClimbingCommandNoVelLimit.target.get().doubleValue() == target.get().doubleValue()) && gotoPosClimbingCommandNoVelLimit.isFinished();
+        }
     }
 
     private void gotoPosClimbing(double pos) {
@@ -366,9 +403,8 @@ public class TelescopeArm extends TelescopeArmBase {
         bottomLimitSwitchRight = motors.right.getReverseLimitSwitch();
         bottomLimitSwitchLeft = motors.left.getReverseLimitSwitch();
 
-        // TODO: use DIO ports
-//        wrungContactSwitchRight = motors.right.getReverseLimitSwitch();
-//        wrungContactSwitchLeft = motors.left.getReverseLimitSwitch();
+        wrungContactSwitchRight = new DigitalInput(Constants.Ids.wrungContactSwitchDIORight)::get;
+        wrungContactSwitchLeft = new DigitalInput(Constants.Ids.wrungContactSwitchDIOLeft)::get;
 
         climberPid = new PIDController(Constants.PID.climbingPid.kP, Constants.PID.climbingPid.kI, Constants.PID.climbingPid.kD);
         climberErrorPid = new PIDController(Constants.PID.climbingPid.kP, Constants.PID.climbingPid.kI, Constants.PID.climbingPid.kD);
@@ -380,9 +416,9 @@ public class TelescopeArm extends TelescopeArmBase {
 
             @Override
             public void execute() {
-                motors.right.set(MathUtil.applyDeadband(JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getThrottle(), 0.05) * 0.7);
-//                motors.left.set(MathUtil.applyDeadband(JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getThrottle(), 0.05) * 0.7);
-                motors.left.set(MathUtil.applyDeadband(JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getY(), 0.05) * 0.7);
+                motors.right.set(-MathUtil.applyDeadband(JoystickHandler.getInstance().getJoystick(Joysticks.Climb).getThrottle(), 0.05) * 0.4);
+//                motors.left.set(MathUtil.applyDeadband(JoystickHandler.getInstance().getJoystick(Joysticks.Climb).getThrottle(), 0.05) * 0.7);
+                motors.left.set(-MathUtil.applyDeadband(JoystickHandler.getInstance().getJoystick(Joysticks.Climb).getY(), 0.05) * 0.4);
             }
 
             @Override
@@ -402,9 +438,40 @@ public class TelescopeArm extends TelescopeArmBase {
         motors.right.stopMotor();
     }
 
+    CommandBase goDownSlowlyCommand = new CommandBase() {
+        {
+            addRequirements(TelescopeArm.this);
+        }
+
+        SlewRateLimiter limiter = new SlewRateLimiter(3);
+
+
+        @Override
+        public void initialize() {
+            super.initialize();
+            limiter.reset((motors.right.getEncoderTicks() + motors.left.getEncoderTicks()) / 2);
+            CommandScheduler.getInstance().schedule(gotoPosClimbingCommandNoVelLimit);
+        }
+
+        @Override
+        public void execute() {
+            double currentTarget = limiter.calculate(-10000);
+            gotoPosClimbingCommandNoVelLimit.updateTarget(currentTarget);
+            CommandScheduler.getInstance().schedule(gotoPosClimbingCommandNoVelLimit);
+            super.execute();
+        }
+    };
+
+    @Override
+    public void goDownSlowly() {
+        CommandScheduler.getInstance().schedule(goDownSlowlyCommand);
+    }
+
     @Override
     public void stopMotors() {
+        CommandScheduler.getInstance().cancel(gotoPosClimbingCommandNoVelLimit);
         CommandScheduler.getInstance().cancel(gotoPosClimbingCommand);
+        CommandScheduler.getInstance().cancel(goDownSlowlyCommand);
         stopLeftMotor();
         stopRightMotor();
     }
@@ -417,9 +484,9 @@ public class TelescopeArm extends TelescopeArmBase {
     @Override
     public List<Binding> getMappings() {
         return List.of(
-                new Binding(Joysticks.Drive, () -> 3, Button::whenPressed, new InstantCommand(this::resetEncoders)),
+                new Binding(Joysticks.Climb, () -> 3, Button::whenPressed, new InstantCommand(this::resetEncoders)),
                 // Climb up
-                new Binding(Joysticks.Drive, () -> 9, Button::whileHeld, new CommandBase() {
+                new Binding(Joysticks.Climb, () -> 9, Button::whileHeld, new CommandBase() {
                     {
                         addRequirements(TelescopeArm.this);
                     }
@@ -436,7 +503,7 @@ public class TelescopeArm extends TelescopeArmBase {
                 }),
 
                 // Go to Ground
-                new Binding(Joysticks.Drive, () -> 10, Button::whileHeld, new CommandBase() {
+                new Binding(Joysticks.Climb, () -> 10, Button::whileHeld, new CommandBase() {
                     {
                         addRequirements(TelescopeArm.this);
                     }
@@ -453,7 +520,7 @@ public class TelescopeArm extends TelescopeArmBase {
                 }),
 
                 // Go over first wrung
-                new Binding(Joysticks.Drive, () -> 1, Button::whileHeld, new CommandBase() {
+                new Binding(Joysticks.Climb, () -> 1, Button::whileHeld, new CommandBase() {
                     {
                         addRequirements(TelescopeArm.this);
                     }
@@ -470,7 +537,7 @@ public class TelescopeArm extends TelescopeArmBase {
                 }),
 
                 // Touch wrung
-                new Binding(Joysticks.Drive, () -> 5, Button::whileHeld, new CommandBase() {
+                new Binding(Joysticks.Climb, () -> 5, Button::whileHeld, new CommandBase() {
                     {
                         addRequirements(TelescopeArm.this);
                     }
@@ -487,38 +554,32 @@ public class TelescopeArm extends TelescopeArmBase {
                 }),
 
                 // go slowly down
-                new Binding(Joysticks.Drive, () -> 7, Button::whileHeld, new CommandBase() {
+                new Binding(Joysticks.Climb, () -> 7, Button::whileHeld, new CommandBase() {
                     {
                         addRequirements(TelescopeArm.this);
                     }
 
-                    private double setPoint = 0;
-                    private Timer timer = new Timer();
+                    SlewRateLimiter limiter = new SlewRateLimiter(3);
+
 
                     @Override
                     public void initialize() {
-                        setPoint = (motors.right.getEncoderTicks() + motors.left.getEncoderTicks()) / 2;
-                        gotoPosClimbing(setPoint);
-                        timer.reset();
-                        timer.start();
+                        super.initialize();
+                        limiter.reset((motors.right.getEncoderTicks() + motors.left.getEncoderTicks()) / 2);
+                        CommandScheduler.getInstance().schedule(gotoPosClimbingCommandNoVelLimit);
                     }
 
                     @Override
                     public void execute() {
-                        setPoint -= timer.get() * 3;
-                        gotoPosClimbingCommand.updateTarget(setPoint);
-                        timer.reset();
-                        timer.start();
+                        double currentTarget = limiter.calculate(-10000);
+                        gotoPosClimbingCommandNoVelLimit.updateTarget(currentTarget);
+                        CommandScheduler.getInstance().schedule(gotoPosClimbingCommandNoVelLimit);
+                        super.execute();
                     }
 
                     @Override
                     public void end(boolean interrupted) {
-                        stopMotors();
-                    }
-
-                    @Override
-                    public boolean isFinished() {
-                        return getBottomLimitSwitchLeft() && getBottomLimitSwitchRight();
+                        CommandScheduler.getInstance().cancel(gotoPosClimbingCommandNoVelLimit);
                     }
                 })
         );
@@ -536,9 +597,11 @@ public class TelescopeArm extends TelescopeArmBase {
         builder.addDoubleProperty("encoder pos left", () -> isInitialized() ? motors.left.getEncoderTicks() : 0.0, null);
         builder.addBooleanProperty("bottom limit switch right", () -> isInitialized() ? getBottomLimitSwitchLeft() : false, null);
         builder.addBooleanProperty("bottom limit switch left", () -> isInitialized() ? getBottomLimitSwitchRight() : false, null);
+        builder.addBooleanProperty("wrung limit switch right", () -> isInitialized() ? wrungContactSwitchRight.get() : false, null);
+        builder.addBooleanProperty("wrung limit switch left", () -> isInitialized() ? wrungContactSwitchLeft.get() : false, null);
         builder.addDoubleProperty("output right", () -> isInitialized() ? motors.right.get() : 0.0, null);
         builder.addDoubleProperty("output left", () -> isInitialized() ? motors.left.get() : 0.0, null);
-        builder.addDoubleProperty("output joystick", () -> isInitialized() ? MathUtil.applyDeadband(JoystickHandler.getInstance().getJoystick(Joysticks.Drive).getY(), 0.05) * 0.7 : 0.0, null);
+        builder.addDoubleProperty("output joystick", () -> isInitialized() ? MathUtil.applyDeadband(JoystickHandler.getInstance().getJoystick(Joysticks.Climb).getY(), 0.05) * 0.7 : 0.0, null);
         builder.addDoubleProperty("error", () -> isInitialized() ? motors.right.getEncoderTicks() - motors.left.getEncoderTicks() : 0.0, null);
         builder.addDoubleProperty("error corr of pid", () -> isInitialized() ? currentErrorCorr : 0.0, null);
     }
