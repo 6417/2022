@@ -15,6 +15,7 @@ import frc.robot.commands.Ballsubsystem.EndPickup;
 import frc.robot.commands.Ballsubsystem.ReverseflowCommand;
 import frc.robot.commands.Ballsubsystem.ShootCommand;
 import frc.robot.commands.Ballsubsystem.StartpickupCommand;
+import frc.robot.commands.Expander.ZeroExpander;
 import frc.robot.commands.Tunnel.PullbackBallsCommand;
 import frc.robot.subsystems.ball.base.BallSubsystemBase;
 import frc.robot.subsystems.ball.base.PickUpBase;
@@ -73,7 +74,6 @@ public class BallSubsystem extends BallSubsystemBase {
         throwerSubmodule = Thrower.getInstance();
         transportSubmodule = Transport.getInstance();
 
-        System.out.println("Ballsubsystem initialized");
 
         registerSubmodule(pickUpSubmodule, throwerSubmodule, transportSubmodule);
     }

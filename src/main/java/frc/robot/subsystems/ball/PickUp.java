@@ -13,6 +13,7 @@ import ch.fridolins.fridowpi.motors.FridolinsMotor.IdleMode;
 import ch.fridolins.fridowpi.motors.FridolinsMotor.LimitSwitchPolarity;
 import ch.fridolins.fridowpi.motors.utils.PidValues;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.ball.base.PickUpBase;
 
 public class PickUp extends PickUpBase {
