@@ -23,7 +23,7 @@ import frc.robot.subsystems.ball.base.TransportBase;
 
 public class BallSubsystem extends BallSubsystemBase {
     private static BallSubsystemBase instance;
-    private static boolean enabled = false;
+    private static boolean enabled = true;
 
     private PickUpBase pickUpSubmodule;
     private TransportBase transportSubmodule;
