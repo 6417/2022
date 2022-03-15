@@ -18,9 +18,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.autonomous.PathviewerLoader;
 import frc.robot.autonomous.RamseteCommandGenerator;
+import frc.robot.commands.Autonomous.Pickup1Ball;
+import frc.robot.commands.Autonomous.SimpleAutonomous;
 import frc.robot.commands.Expander.ZeroExpander;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.ball.BallSubsystem;
+import frc.robot.subsystems.ball.PickUp;
 import frc.robot.subsystems.climber.TelescopeArm;
 import frc.robot.subsystems.climber.Tilter;
 
@@ -96,20 +99,23 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         Navx.getInstance().reset();
 
-        String trajectoryJSON = "paths/output/GeradeAus3m.wpilib.json";
-
-        Trajectory pathWeavertest = PathviewerLoader.loadTrajectory(trajectoryJSON);
-
-        m_autonomousCommand = RamseteCommandGenerator.generateRamseteCommand(pathWeavertest);
-
-        // Drive.getInstance().setDirectionToReverse();
-        Drive.getInstance().setDirectionToForward();
-
-        if (m_autonomousCommand != null) {
-            m_autonomousCommand.schedule();
-        }
+//        String trajectoryJSON = "paths/output/s spiral.wpilib.json";
+//        // String trajectoryJSON = "paths/output/GeradeAus3m.wpilib.json";
+//
+//        Trajectory pathWeavertest = PathviewerLoader.loadTrajectory(trajectoryJSON);
+//
+//        m_autonomousCommand = RamseteCommandGenerator.generateRamseteCommand(pathWeavertest);
+//
+//        // Drive.getInstance().setDirectionToReverse();
+//        Drive.getInstance().setDirectionToForward();
+//
+//        if (m_autonomousCommand != null) {
+//            m_autonomousCommand.schedule();
+//        }
 
         CommandScheduler.getInstance().schedule(new ZeroExpander());
+//        CommandScheduler.getInstance().schedule(new SimpleAutonomous());
+        CommandScheduler.getInstance().schedule(new Pickup1Ball());
     }
 
     @Override

@@ -108,10 +108,10 @@ public class BallSubsystem extends BallSubsystemBase {
     @Override
     public List<Binding> getMappings() {
         return List.of(
-                new Binding(() -> 0, () -> 1, Button::whenPressed, new ShootCommand()),
-                new Binding(() -> 0, () -> 2, Button::whenPressed, new InstantCommand(this::togglePickup)),
-                new Binding(() -> 0, () -> 7, Button::whileHeld, new ReverseflowCommand()),
-                new Binding(() -> 0, () -> 8, Button::whenPressed, new ZeroExpander())
+            new Binding(() -> 0, () -> 1, Button::whenPressed, new ShootCommand()),
+            new Binding(() -> 0, () -> 2, Button::whenPressed, new InstantCommand(this::togglePickup)),
+            new Binding(() -> 0, () -> 7, Button::whileHeld, new ReverseflowCommand()),
+            new Binding(() -> 0, () -> 8, Button::whileHeld, new ZeroExpander())
         );
     }
 }
