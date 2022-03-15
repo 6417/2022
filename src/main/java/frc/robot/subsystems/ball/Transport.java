@@ -30,7 +30,7 @@ public class Transport extends TransportBase{
     private FridolinsMotor motor;
     
     private static TransportBase instance = null;
-    private static final boolean enabled = false;
+    private static final boolean enabled = true;
 
 
     public static TransportBase getInstance() {
