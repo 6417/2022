@@ -106,7 +106,6 @@ public class Robot extends TimedRobot {
         Drive.getInstance().setDirectionToForward();
 
         if (m_autonomousCommand != null) {
-            Drive.getInstance().setDirectionToReverse();
             m_autonomousCommand.schedule();
         }
 

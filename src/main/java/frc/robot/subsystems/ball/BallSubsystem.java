@@ -80,7 +80,9 @@ public class BallSubsystem extends BallSubsystemBase {
 
     public void setShooterToVelocity() {
         this.throwerSubmodule.setVelocity(this.throwerSubmodule.getRequiredVelocity());
-    };
+    }
+
+    ;
 
     @Override
     public boolean getShooterLightbarrier() {
@@ -94,8 +96,7 @@ public class BallSubsystem extends BallSubsystemBase {
                 CommandScheduler.getInstance().cancel(endPickupCommand);
 
             CommandScheduler.getInstance().schedule(startPickupCommand);
-        }
-        else {
+        } else {
             isPickingUp = false;
             if (CommandScheduler.getInstance().isScheduled(startPickupCommand))
                 CommandScheduler.getInstance().cancel(startPickupCommand);
@@ -107,9 +108,10 @@ public class BallSubsystem extends BallSubsystemBase {
     @Override
     public List<Binding> getMappings() {
         return List.of(
-            new Binding(() -> 0, () -> 1, Button::whenPressed, new ShootCommand()),
-            new Binding(() -> 0, () -> 2, Button::whenPressed, new InstantCommand(this::togglePickup)),
-            new Binding(() -> 0, () -> 7, Button::whileHeld, new ReverseflowCommand())
+                new Binding(() -> 0, () -> 1, Button::whenPressed, new ShootCommand()),
+                new Binding(() -> 0, () -> 2, Button::whenPressed, new InstantCommand(this::togglePickup)),
+                new Binding(() -> 0, () -> 7, Button::whileHeld, new ReverseflowCommand()),
+                new Binding(() -> 0, () -> 8, Button::whenPressed, new ZeroExpander())
         );
     }
 }
