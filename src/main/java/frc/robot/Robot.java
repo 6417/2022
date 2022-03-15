@@ -113,7 +113,6 @@ public class Robot extends TimedRobot {
 //            m_autonomousCommand.schedule();
 //        }
 
-        CommandScheduler.getInstance().schedule(new ZeroExpander());
         CommandScheduler.getInstance().schedule(new SimpleAutonomous());
 //        CommandScheduler.getInstance().schedule(new Pickup1Ball());
     }

@@ -6,11 +6,13 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Ballsubsystem.EndPickup;
 import frc.robot.commands.Ballsubsystem.ShootCommand;
 import frc.robot.commands.Ballsubsystem.StartpickupCommand;
+import frc.robot.commands.Expander.ZeroExpander;
 import frc.robot.subsystems.Drive;
 
 public class Pickup1Ball extends SequentialCommandGroup {
     public Pickup1Ball() {
         addCommands(
+                new ZeroExpander(),
                 new ShootCommand(),
                 new ParallelCommandGroup(new StartpickupCommand(), new driveToPickup()),
                 new EndPickup()
