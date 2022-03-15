@@ -94,8 +94,7 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         Navx.getInstance().reset();
 
-        String trajectoryJSON = "paths/output/s spiral.wpilib.json";
-        // String trajectoryJSON = "paths/output/GeradeAus3m.wpilib.json";
+        String trajectoryJSON = "paths/output/GeradeAus3m.wpilib.json";
 
         Trajectory pathWeavertest = PathviewerLoader.loadTrajectory(trajectoryJSON);
 
@@ -105,6 +104,7 @@ public class Robot extends TimedRobot {
         Drive.getInstance().setDirectionToForward();
 
         if (m_autonomousCommand != null) {
+            Drive.getInstance().setDirectionToReverse();
             m_autonomousCommand.schedule();
         }
     }
